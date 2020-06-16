@@ -5,6 +5,7 @@ import { DemoUseCheckboxState } from './demos/DemoUseCheckboxState'
 import { DemoUseToggleState } from './demos/DemoUseToggleState'
 import { DemoUseGetSetState } from './demos/DemoUseGetSetState'
 import { PrismCode } from "./components/PrismCode"
+import { ColorBorders } from './components/ColorBorders'
 import "./styles.css"
 
 //====////////////=========================O
@@ -19,10 +20,13 @@ const ExampleComp = () => {
     </div>
   )
 }
+
 //======================////===============O
 export default function App() {
   return (
     <div className="App">
+
+
       <div style={{backgroundColor:'#011627', padding: 20}}>
         <PrismCode stl={{ textAlign: "left" }} language='js' code=
           {`
@@ -51,13 +55,9 @@ export default function App() {
 
     `.trim()} />
     </div>
-    <div style={{padding:3, border:'solid red 2px', margin: 20}}>
-      <div style={{padding:3, border:'solid orange 2px', margin: 2}}>
-        <div style={{padding:30, border:'solid yellow 2px', margin: 2}}>
-          <ExampleComp />
-        </div>
-      </div>
-    </div>
+    <ColorBorders colors={['red','orange','#dd6', '#4f4', '#99d']} >
+      <ExampleComp />
+    </ColorBorders>
 
     <DemoUseGetSetState />
     <DemoUseToggleState />
