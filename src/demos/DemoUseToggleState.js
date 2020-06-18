@@ -37,11 +37,11 @@ export const DemoUseToggleState = () => {
         {  togs.isFun && <button onClick={togs.turnOff.isFun}> :(  </button> } {" "}
       </div>
 
-      {mapHash( togs.initVals, ([k,v]) => <Flagger key={k} _key={k}/> ) }
+      {mapHash( togs.initVals, ([k,v]) => <Flagger key={k} key={k} _key={k}/> ) }
       < br />
 
       {mapHash( togs.initVals, ([k,v]) => (
-        <span {...rgStl( togs[k] )}> 
+        <span key={k} {...rgStl( togs[k] )}> 
           { togs[k] ? ' Y ' : ' n ' }
         </span>
       ))}
