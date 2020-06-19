@@ -24,14 +24,14 @@ const AutoForm = ({fields,bindInput}) => {
 )}
 //===========//////////////========================o
 export const DemoUseEzForm = () => {
+  let [submittedTxt, setSubmitted] = useState('_')
+  //-------------------------------------o
   const initVals = {
     phone:'999-123-4567',
     first:['Gee', {style:{color:'blue'}, label:'First name==>'}],
     last:'Willikars',
     password: '12345'
   }
-  let [submittedTxt, setSubmitted] = useState('_')
-  //-------------------------------------o
   const {inputs, doChange, doSubmit, bindInput} = useEzForm(
     initVals,
     (x)=>{ 
