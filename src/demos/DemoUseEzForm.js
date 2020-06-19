@@ -12,19 +12,21 @@ const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   </div>
 )
 //-------------------------------------o
-const AutoForm = ({fields, inputs, onChange, onSubmit}) => (
+const AutoForm = ({fields,bindInput}) => { 
+  const {onSubmit} = bindInput()
+  return(
   <form onSubmit={onSubmit}>
     {Object.keys(fields).map( k => (
-      <Fielder key={k} label={k+': '} name={k} inputs={inputs} onChange={onChange} />
+      <Fielder key={k} label={k+': '} {...bindInput(k)} />
     ))}
     <input type="submit" value="Submit" />
   </form>
-)
+)}
 //===========//////////////========================o
 export const DemoUseEzForm = () => {
   const initVals = {
     phone:'999-123-4567',
-    first:'Gee',
+    first:['Gee', {style:{color:'blue'}, label:'First name==>'}],
     last:'Willikars',
     password: '12345'
   }
@@ -70,8 +72,8 @@ export const DemoUseEzForm = () => {
       <br />
       {/* ------------------------------------------ */}
       <form onSubmit={doSubmit}>
-        <Fielder label='Phone: ' {...bindInput('phone')}/>
-        <Fielder label='First: ' name='first' inputs={inputs} onChange={doChange}/>
+        <Fielder label='Phone: ' {...bindInput('phone')} />
+        <Fielder label='OVERRIDDEN_BY_BIND' {...bindInput('first')} />
         <Fielder label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
         <Fielder label='Password: ' {...bindInput('password')} type='password'/>
         <input type="submit" value="Submit" />
@@ -79,7 +81,7 @@ export const DemoUseEzForm = () => {
       <br />
       {/* ------------------------------------------ */}
       {/* <AutoForm fields={initVals} inputs={inputs} onChange={doChange}/> */}
-      <AutoForm fields={initVals} {...bindInput()}/>
+      <AutoForm fields={initVals} bindInput={bindInput}/>
       <br />
       <div>Submitted data:</div>
       <pre style={{margin:0, fontSize:10}}>

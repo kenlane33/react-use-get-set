@@ -31,9 +31,33 @@ export const makeFuncForEachInHash = (obj, hash, funcNm, funcMaker ) => {
 //   <button onClick={obj.logMe.sun}> Log Sun </button>
 // </div>)
 
+//====//////////////////=====================O
 export const callArrFunc = ( arrFn ) => {
   const [func,...funcParams] = arrFn
   return func( ...funcParams )
 }// Usage: ------------------------------
 // const [ a, setA ] = callArrFunc( [ useState, 42 ] )
+
+//====//////////////////=====================O
+const setArrKV = (arr,i,k,v) => {
+  if (arr[i]===undefined) arr[i] = {}
+  arr[i][k] = v
+}
+//====//////////////////=====================O
+const ensureArr = (arr) => (Array.isArray( arr )) ? arr : [arr]
+//====//////////////////=====================O
+export const unpackHashArrs = ( hash, hashArr = [] ) => {
+  forEachInHash( hash, ([k,v])=>{
+    ensureArr(v).forEach( ( x, i ) => setArrKV( hashArr, i, k, x ) )
+  })
+  return hashArr
+} // Usage: --------------------------
+// Think of getting a new, sparse hash per column
+// unpackHashArrs( {
+//   a:1, 
+//   b:2, 
+//   c:[6,7], 
+//   d:[88,99,111] 
+// } )
+//> [{a:1, b:2, c:6, d:88}, {c:7, d:99}, {d:111}]
 
