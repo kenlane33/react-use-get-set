@@ -1,16 +1,19 @@
-import {useState} from "react"
+import { useGetSetState } from "./useGetSetState.js"
+
 
 export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}) ) => {
-  const [inputs, setInputs] = useState( initialValues || {} );
+  //const [inputs, setInputs] = useState( initialValues || {} )
+  const inputs = useGetSetState( initialValues || {} )
   //------------------------------o
   const doSubmit = (ev) => {
     ev && ev.preventDefault()
-    submitCallback && submitCallback( inputs )
+    submitCallback && submitCallback( inputs.vals )
   }
   //------------------------------o
   const doChange = (ev) => {
     ev.persist()
-    setInputs(inputs => ({...inputs, [ev.target.name]: ev.target.value}))
+    // setInputs(inputs => ({...inputs, [ev.target.name]: ev.target.value}))
+    inputs[ev.target.name] = ev.target.value
   }
   //------------------------------o
   const bindInput = (nm) => ({
