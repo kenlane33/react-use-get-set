@@ -85,7 +85,7 @@ export const DemoUseEzForm = () => {
       <br />
       <div>Submitted data:</div>
       <pre style={{margin:0, fontSize:10}}>
-        {submittedTxt.split(',').join(',\n')}
+        {submittedTxt && submittedTxt.split(',').join(',\n')}
       </pre>
       <br /><br />
     </div>
