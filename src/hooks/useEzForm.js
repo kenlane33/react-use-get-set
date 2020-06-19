@@ -3,7 +3,7 @@ import { unpackHashArrs } from '../helpers/iterators.js'
 
 export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}) ) => {
   //const [inputs, setInputs] = useState( initialValues || {} )
-  const [initVals, inputProps] = unpackHashArrs(initialValues)
+  const [initVals, hashOfInputProps] = unpackHashArrs(initialValues)
   const inputs = useGetSetState( initVals || {} )
   //------------------------------o
   const doSubmit = (ev) => {
@@ -24,13 +24,17 @@ export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}) ) => {
     name: nm,
     value:    (nm===undefined) ? undefined : inputs[nm],
     onSubmit: (nm===undefined) ? doSubmit : undefined,
-  }, (inputProps||{})[nm]||{} )) // merge if present
+  }, (hashOfInputProps||{})[nm]||{} )) // merge props if present in initVals arrays
   //------------------------------o
   return { inputs, doChange, doSubmit, bindInput}
   
 }// Usage --------------------
 // const {doSubmit, bindInput} = useEzForm(
-//   { first:'Gee', last:'Willikars'},
+//   { 
+//     first:'Gee', 
+//     last:['Willikars', {style:{color:'blue'} }]
+//     pw:  ['', {type:'password'}]
+//    },
 //   (x)=>console.log(x)
 // )
 // return (
@@ -40,6 +44,9 @@ export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}) ) => {
 //     </label>
 //     <label> 
 //       Last name: <input {...bindInput('last')} />
+//     </label>
+//     <label> 
+//       Password: <input {...bindInput('pw')} />
 //     </label>
 //     <input type="submit" value="Submit" />
 //   </form>      

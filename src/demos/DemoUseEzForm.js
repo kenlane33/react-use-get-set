@@ -25,12 +25,13 @@ const AutoForm = ({fields,bindInput}) => {
 //===========//////////////========================o
 export const DemoUseEzForm = () => {
   let [submittedTxt, setSubmitted] = useState('_')
+  let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
   const initVals = {
     phone:'999-123-4567',
     first:['Gee', {style:{color:'blue'}, label:'First name==>'}],
     last:'Willikars',
-    password: '12345'
+    pw: ['12345', {type:'password'}]
   }
   const {inputs, doChange, doSubmit, bindInput} = useEzForm(
     initVals,
@@ -62,7 +63,13 @@ export const DemoUseEzForm = () => {
 
         <label> Pw:
           {/* <input value={inputs.password} name={'password'} onChange={doChange} type="password" /> */}
-          <input {...bindInput('password')} type="password" />
+          {/* Later props override those spread in the earlier ones. 
+             Ternary on type:'text' lets us optionally override the 
+             type='password' from the bindInput('pw') spread of props
+          */}
+          <input {...bindInput('pw')} {...((seePw)?{type:'text'}:{})} />
+          <input type='checkbox' checked={seePw} onChange={()=>setSeePw(!seePw)}/>
+          <span style={{fontSize:9}}>See</span>
         </label><br />
 
 
@@ -75,7 +82,7 @@ export const DemoUseEzForm = () => {
         <Fielder label='Phone: ' {...bindInput('phone')} />
         <Fielder label='OVERRIDDEN_BY_BIND' {...bindInput('first')} />
         <Fielder label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
-        <Fielder label='Password: ' {...bindInput('password')} type='password'/>
+        <Fielder label='Password: ' {...bindInput('pw')} type='password'/>
         <input type="submit" value="Submit" />
       </form>
       <br />
