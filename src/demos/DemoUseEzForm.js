@@ -9,10 +9,10 @@ export const DemoUseEzForm = () => {
   let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
   const initVals = {
-    phone:'999-123-4567',
-    first:['Gee', {style:{color:'blue'}, label:'First name==>'}],
-    last:'Willikars',
-    pw: ['12345', {type:'password'}]
+    phone: '999-123-4567', // just an initial value
+    first:['Gee', {style:{color:'blue'}, label:'First name==>'}], // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.first
+    last:'Willikars',      // just an initial value
+    pw: ['12345', {type:'password'}] // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
   }
   const ezForm = useEzForm(
     initVals,
@@ -30,28 +30,30 @@ export const DemoUseEzForm = () => {
       <form onSubmit={doSubmit}>
 
         <label> Phone:
-          {/* <input value={inputs.phone} name={'phone'} onChange={doChange} type="text" /> */}
+          {/* Automatic style of putting props on input */}
           <input {...inputBinds.phone} />
         </label><br />
 
         <label> First:
-          {/* <input value={inputs.first} name={'first'} onChange={doChange} type="text" /> */}
+          {/* Automatic style of putting props on input */}
           <input {...inputBinds.first} />
         </label><br />
 
         <label> Last:
+          {/* Manual style of putting props on input */}
           <input value={inputs.last} name={'last'} onChange={doChange} type="text" />
         </label><br />
 
         <label> Pw:
-          {/* <input value={inputs.password} name={'password'} onChange={doChange} type="password" /> */}
-          {/* Later props override those spread in the earlier ones. 
-             Ternary on type:'text' lets us optionally override the 
-             type='password' from the bindInput('pw') spread of props
-          */}
-          <input {...inputBinds.pw} {...((seePw)?{type:'text'}:{})} />
-          <input type='checkbox' checked={seePw} onChange={()=>setSeePw(!seePw)}/>
+          {/* === Overriding props to unmask a password ===
+            Later tag props override those spread earlier on the tag. 
+            Ternary on seePw bool lets us optionally override the 
+            type='password' from the bindInput.pw with type:'text' */}
+          <input {...inputBinds.pw} {...( (seePw) ? {type:'text'} : {} )} />
+
+          <input type='checkbox' checked={seePw} onChange={()=>setSeePw( ! seePw )}/>
           <span style={{fontSize:9}}>See</span>
+
         </label><br />
 
 

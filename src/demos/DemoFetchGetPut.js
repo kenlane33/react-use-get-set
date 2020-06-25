@@ -26,7 +26,7 @@ export const DemoFetchGetPut = () => {
   return (
     <div>
 
-      <DemoHeader demoTxt='DemoFetchGetPut' useTxt='useFetchGetPutHash()' />
+      <DemoHeader demoTxt='DemoUseFetchGetPut' useTxt='useFetchGetPut()' />
 
       <AutoForm fields={ezForm.inputs.vals} {...ezForm} />
       <br />
