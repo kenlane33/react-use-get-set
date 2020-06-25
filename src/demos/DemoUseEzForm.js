@@ -22,61 +22,94 @@ export const DemoUseEzForm = () => {
     }
   )
   const {inputs, doChange, doSubmit, inputBinds, bindForm} = ezForm
+  // console.log( ezForm )
+
+  const FormHeader = ({txt}) => (
+    <div style={{padding:10, backgroundColor:'#ddf', width:'70%', marginBottom:10}}>
+      {txt}
+    </div>
+  )
+
   //-------------------------------------o
   return (
     <div>
       <DemoHeader demoTxt='DemoUseEzForm' useTxt='useEzForm()' />
       {/* ------------------------------------------ */}
-      <form onSubmit={doSubmit}>
+      {/* <FormBox txt="Manual form and mixed inputBind and manual inputs"> */}
+        <form onSubmit={doSubmit}>
 
-        <label> Phone:
-          {/* Automatic style of putting props on input */}
-          <input {...inputBinds.phone} />
-        </label><br />
+          <label> Phone:
+            {/* Automatic style of putting props on input */}
+            <input {...inputBinds.phone} />
+          </label><br />
 
-        <label> First:
-          {/* Automatic style of putting props on input */}
-          <input {...inputBinds.first} />
-        </label><br />
+          <label> First:
+            {/* Automatic style of putting props on input */}
+            <input {...inputBinds.first} />
+          </label><br />
 
-        <label> Last:
-          {/* Manual style of putting props on input */}
-          <input value={inputs.last} name={'last'} onChange={doChange} type="text" />
-        </label><br />
+          <label> Last:
+            {/* Manual style of putting props on input */}
+            <input value={inputs.last} name={'last'} onChange={doChange} type="text" />
+          </label><br />
 
-        <label> Pw:
-          {/* === Overriding props to unmask a password ===
-            Later tag props override those spread earlier on the tag. 
-            Ternary on seePw bool lets us optionally override the 
-            type='password' from the bindInput.pw with type:'text' */}
-          <input {...inputBinds.pw} {...( (seePw) ? {type:'text'} : {} )} />
+          <label> Pw:
+            {/* === Overriding props to unmask a password ===
+              Later tag props override those spread earlier on the tag. 
+              Ternary on seePw bool lets us optionally override the 
+              type='password' from the bindInput.pw with type:'text' */}
+            <input {...inputBinds.pw} {...( (seePw) ? {type:'text'} : {} )} />
 
-          <input type='checkbox' checked={seePw} onChange={()=>setSeePw( ! seePw )}/>
-          <span style={{fontSize:9}}>See</span>
+            <input type='checkbox' checked={seePw} onChange={()=>setSeePw( ! seePw )}/>
+            <span style={{fontSize:9}}>See</span>
 
-        </label><br />
+          </label><br />
 
 
-        <input type="submit" value="Submit" />
+          <input type="submit" value="Submit" />
 
-      </form>      
+        </form>      
+      {/* </FormBox> */}
       <br />
       {/* ------------------------------------------ */}
-      <form onSubmit={doSubmit}>
-        <Fielder label='Phone: ' {...inputBinds.phone} />
-        <Fielder label='OVERRIDDEN_BY_BIND' {...inputBinds.first} />
-        <Fielder label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
-        <Fielder label='Password: ' {...inputBinds.pw} type='password'/>
-        <input type="submit" value="Submit" />
-      </form>
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="Fielder: inputBind for inputs"/>
+        <form onSubmit={doSubmit}>
+          <Fielder label='Phone: ' {...inputBinds.phone} />
+          <Fielder label='OVERRIDDEN_BY_BIND' {...inputBinds.first} />
+          <Fielder label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
+          <Fielder label='Password: ' {...inputBinds.pw} type='password'/>
+          <input type="submit" value="Submit" />
+        </form>
+      </div>
       <br />
       {/* ------------------------------------------ */}
-      {/* <AutoForm fields={initVals} inputs={inputs} onChange={doChange}/> */}
-      <AutoForm fields={initVals} inputBinds={inputBinds} bindForm={bindForm}/>
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="AutoForm: Manual props" />
+        <AutoForm fields={initVals} inputBinds={inputBinds} bindForm={bindForm}/>
+      </div>
       <br />
       {/* ------------------------------------------ */}
-      <AutoForm fields={initVals} {...ezForm} />
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="Fully automatic AutoForm" />
+        <AutoForm {...ezForm} />
+        </div>
+      <br />  
+      {/* ------------------------------------------ */}
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="Filter and control the order of the inputs of an AutoForm" />
+        <div style={{display:'flex'}}>
+          <div style={{flex:1}}>
+            <AutoForm fields={['last','first']} {...ezForm} />
+          </div>
+          <div style={{flex:1}}>
+            <AutoForm fields={['first','last']} {...ezForm} />
+          </div>
+          <br />
+        </div>
+        </div>
       <br />
+      {/* ------------------------------------------ */}
       <div>Submitted data:</div>
       <pre style={{margin:0, fontSize:10}}>
         {submittedTxt && submittedTxt.split(',').join(',\n')}

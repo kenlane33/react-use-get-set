@@ -51,7 +51,8 @@ const setArrKV = (arr,i,k,v) => {
   arr[i][k] = v
 }
 //====//////////////////=====================O
-export const ensureArr = (arr) => {
+export const ensureArr = (arr, fallback) => {
+  arr = arr || fallback
   if (Array.isArray( arr )) return arr
   else if (typeof arr  === "object") return Object.keys(arr)
   else return [arr] 

@@ -1,4 +1,5 @@
 import React from "react"
+import { ensureArr } from '../helpers/iterators'
 //-------------------------------------o
 export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   <div>
@@ -11,7 +12,7 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
 //-------------------------------------o
 export const AutoForm = ({fields, bindForm, inputBinds}) => (
   <form {...bindForm}>
-    {Object.keys(fields).map( k => (
+    {ensureArr(fields, Object.keys(inputBinds)).map( k => (
       <Fielder key={k} label={k+': '} {...inputBinds[k]} />
     ))}
     <input type="submit" value="Submit" />
