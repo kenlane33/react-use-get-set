@@ -5,6 +5,7 @@ import { DemoUseToggleState } from './demos/DemoUseToggleState'
 import { DemoUseResetState } from './demos/DemoUseResetState'
 import { DemoUseCheckboxState } from './demos/DemoUseCheckboxState'
 import { DemoUseEzForm } from './demos/DemoUseEzForm'
+import { DemoFetchGetPut } from './demos/DemoFetchGetPut'
 
 //import { forEachInHash } from "./helpers/iterators.js"
 import "./styles.css"
@@ -15,6 +16,7 @@ export default function App() {
   //-------------------------------------o
   return (
   <div className="App">
+    <DemoFetchGetPut />
     <DemoUseEzForm />
     <DemoUseGetSetStateWithCode />    
     <DemoUseGetSetState />

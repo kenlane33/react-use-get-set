@@ -1,7 +1,7 @@
 import { useGetSetState } from "./useGetSetState.js"
-import { unpackHashArrs } from '../helpers/iterators.js'
+import { unpackHashArrs, forEachInHash } from '../helpers/iterators.js'
 
-export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}) ) => {
+export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}), formProps={} ) => {
   //const [inputs, setInputs] = useState( initialValues || {} )
   const [initVals, hashOfInputProps] = unpackHashArrs(initialValues)
   const inputs = useGetSetState( initVals || {} )
@@ -17,19 +17,25 @@ export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}) ) => {
     inputs[ev.target.name] = ev.target.value
   }
   //------------------------------o
-  const bindInput = (nm) => (Object.assign({
-    inputs: inputs,
+  const makeInputBindForKey = (nm) => (Object.assign({
+    inputs: inputs, // send in the whole Hashy structure, too
     onChange: doChange,
     type: 'text',
     name: nm,
-    value:    (nm===undefined) ? undefined : inputs[nm],
-    onSubmit: (nm===undefined) ? doSubmit : undefined,
+    value:    inputs[nm],
   }, (hashOfInputProps||{})[nm]||{} )) // merge props if present in initVals arrays
+
+  let inputBinds = {}
+  forEachInHash( inputs.vals, ([k,v])=>{ inputBinds[k] = makeInputBindForKey(k) })
   //------------------------------o
-  return { inputs, doChange, doSubmit, bindInput}
+  const bindForm = (Object.assign({
+    onSubmit: doSubmit 
+  }, formProps||{} )) // merge props if present 
+  //------------------------------o
+  return { inputs, doChange, doSubmit, inputBinds, bindForm}
   
 }// Usage --------------------
-// const {doSubmit, bindInput} = useEzForm(
+// const {doSubmit, bindInput, bindForm} = useEzForm(
 //   { 
 //     first:'Gee', 
 //     last:['Willikars', {style:{color:'blue'} }]

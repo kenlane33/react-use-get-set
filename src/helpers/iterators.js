@@ -16,6 +16,13 @@ export const mapHash = (hash, fn) => {
 
 
 //====//////////////////=====================O
+export const makeThingForEachInHash = (obj, hash, thingNm, thingMaker ) => {
+  obj[thingNm] = {} // EX: obj.binds
+  const makeThing = ([k,v]) => { obj[thingNm][k] = thingMaker(k,v) } // EX: obj.binds.fun
+  forEachInHash(hash, makeThing)
+} // Usage: ------------------------------
+
+//====//////////////////=====================O
 export const makeFuncForEachInHash = (obj, hash, funcNm, funcMaker ) => {
   obj[funcNm] = {} // EX: obj.reset
   const makeFn = ([k,v]) => { obj[funcNm][k] = funcMaker(k,v) } // EX: obj.reset.fun()
@@ -44,7 +51,11 @@ const setArrKV = (arr,i,k,v) => {
   arr[i][k] = v
 }
 //====//////////////////=====================O
-const ensureArr = (arr) => (Array.isArray( arr )) ? arr : [arr]
+export const ensureArr = (arr) => {
+  if (Array.isArray( arr )) return arr
+  else if (typeof arr  === "object") return Object.keys(arr)
+  else return [arr] 
+}
 //====//////////////////=====================O
 export const unpackHashArrs = ( hash, hashArr = [] ) => {
   forEachInHash( hash, ([k,v])=>{
