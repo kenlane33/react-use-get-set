@@ -18,7 +18,8 @@ export const DemoFetchGetPut = () => {
     (x)=>{ 
       console.log(x)
       setSubmitted( JSON.stringify(x) )
-    }
+    },
+
   )
   // const {inputs, doChange, doSubmit, inputBinds} = ezForm
 

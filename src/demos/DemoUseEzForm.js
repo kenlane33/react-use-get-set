@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { useEzForm } from "../hooks/useEzForm"
 import { DemoHeader } from './DemoHeader'
 import { AutoForm, Fielder } from '../components/AutoForm'
+import { PrismCode } from "../components/PrismCode"
 
 //===========//////////////========================o
 export const DemoUseEzForm = () => {
@@ -25,17 +26,56 @@ export const DemoUseEzForm = () => {
   // console.log( ezForm )
 
   const FormHeader = ({txt}) => (
-    <div style={{padding:10, backgroundColor:'#ddf', width:'70%', marginBottom:10}}>
+    <div style={{padding:10, backgroundColor:'#eee', marginBottom:10}}>
       {txt}
     </div>
   )
-
+  const leftStl = {textAlign:'left'}
+  const Code = (p) => <pre style={{display:'inline', fontWeight:700, fontSize:17}}>{p.children}</pre>
   //-------------------------------------o
   return (
     <div>
       <DemoHeader demoTxt='DemoUseEzForm' useTxt='useEzForm()' />
       {/* ------------------------------------------ */}
-      {/* <FormBox txt="Manual form and mixed inputBind and manual inputs"> */}
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="Data used in examples below:" />
+        <div style={{marginLeft:40}}>
+
+          <div style={{backgroundColor:'#011627', padding: 20, width: 600 }}>  
+            <PrismCode language='js' code={`
+const initVals = {
+  phone: '999-123-4567',
+  first:['Gee', {style:{color:'blue'}, label:'First name==>'}],
+  last:'Willikars',
+  pw: ['12345', {type:'password'}] 
+}`.trim()} >
+            </PrismCode>
+            </div>
+          <p style={leftStl}>
+            In this hash:<br />
+            * The keys <Code>phone</Code> and <Code>last</Code> just set a simple intial value for the EzForm.<br />
+            * However, the keys <Code>first</Code> and <Code>pw</Code> use an <b>array</b> to let you add extra goodies!<br />
+            <br />
+            When you use an array:<br />
+            * [0] is an <b>intial value</b> for the key, <br />
+            * [1] is a <b>hash to spread</b> onto an input tag later (using a "bind" pattern)<br />
+            <br />
+            Spreading a bind hash looks like this:  <br />
+            <Code>{`<input {...ezForm.inputBinds.first} />`}</Code>
+          </p>
+        </div>
+      </div>
+      <br />  
+      {/* ------------------------------------------ */}
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="Fully automatic AutoForm" />
+        <AutoForm {...ezForm} />
+      </div>
+      <br />  
+      {/* ------------------------------------------ */}
+      <div style={{border:'1px solid grey'}}>
+        <FormHeader txt="Manual form and demo of <input/> tags done (1) manually and (2) with {...inputBinds.*}"/>
+
         <form onSubmit={doSubmit}>
 
           <label> Phone:
@@ -69,14 +109,14 @@ export const DemoUseEzForm = () => {
           <input type="submit" value="Submit" />
 
         </form>      
-      {/* </FormBox> */}
+      </div>
       <br />
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
-        <FormHeader txt="Fielder: inputBind for inputs"/>
+        <FormHeader txt="Fielder: Manual form and {...inputBinds.*} for <input/>"/>
         <form onSubmit={doSubmit}>
           <Fielder label='Phone: ' {...inputBinds.phone} />
-          <Fielder label='OVERRIDDEN_BY_BIND' {...inputBinds.first} />
+          <Fielder label='THIS_LABEL_TXT_OVERRIDDEN_BY_INPUT_BINDS' {...inputBinds.first} />
           <Fielder label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
           <Fielder label='Password: ' {...inputBinds.pw} type='password'/>
           <input type="submit" value="Submit" />
@@ -89,12 +129,6 @@ export const DemoUseEzForm = () => {
         <AutoForm fields={initVals} inputBinds={inputBinds} bindForm={bindForm}/>
       </div>
       <br />
-      {/* ------------------------------------------ */}
-      <div style={{border:'1px solid grey'}}>
-        <FormHeader txt="Fully automatic AutoForm" />
-        <AutoForm {...ezForm} />
-        </div>
-      <br />  
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
         <FormHeader txt="Filter and control the order of the inputs of an AutoForm" />
