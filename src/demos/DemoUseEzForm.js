@@ -41,7 +41,7 @@ export const DemoUseEzForm = () => {
         <FormHeader txt="Data used in examples below:" />
         <div style={{marginLeft:40}}>
 
-          <div style={{backgroundColor:'#011627', padding: 20, width: 600 }}>  
+          <div style={{backgroundColor:'#011627', padding: 20, width: 490 }}>  
             <PrismCode language='js' code={`
 const initVals = {
   phone: '999-123-4567',
