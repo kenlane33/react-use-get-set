@@ -47,7 +47,7 @@ const initVals = {
   phone: '999-123-4567',
   first:['Gee', {style:{color:'blue'}, label:'First name==>'}],
   last:'Willikars',
-  pw: ['12345', {type:'password'}] 
+  pw: ['12345', {type:'passXXXword'}] 
 }`.trim()} >
             </PrismCode>
             </div>
