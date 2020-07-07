@@ -41,7 +41,7 @@ export const DemoUseEzForm = () => {
         <FormHeader txt="Data used in examples below:" />
         <div style={{marginLeft:40}}>
 
-          <div style={{backgroundColor:'#011627', padding: 20, width: 490 }}>  
+          <div style={{backgroundColor:'#011627', padding: 20, width: 490, margin:'10 auto' }}>  
             <PrismCode language='js' code={`
 const initVals = {
   phone: '999-123-4567',
@@ -53,7 +53,7 @@ const initVals = {
             </div>
           <p style={leftStl}>
             In this hash:<br />
-            * The keys <Code>phone</Code> and <Code>last</Code> just set a simple intial value for the EzForm.<br />
+            * The keys <Code>phone</Code> and <Code>last</Code> just set a simple <b>intial value</b> for the EzForm.<br />
             * However, the keys <Code>first</Code> and <Code>pw</Code> use an <b>array</b> to let you add extra goodies!<br />
             <br />
             When you use an array:<br />
