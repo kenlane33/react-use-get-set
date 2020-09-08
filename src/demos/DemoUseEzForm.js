@@ -51,7 +51,7 @@ const initVals = {
 }`.trim()} >
             </PrismCode>
             </div>
-          <p style={leftStl}>
+          <div style={leftStl}>
             In this hash:<br />
             * The keys <Code>phone</Code> and <Code>last</Code> just set a simple <b>intial value</b> for the EzForm.<br />
             * However, the keys <Code>first</Code> and <Code>pw</Code> use an <b>array</b> to let you add extra goodies!<br />
@@ -62,7 +62,7 @@ const initVals = {
             <br />
             Spreading a bind hash looks like this:  <br />
             <Code>{`<input {...ezForm.inputBinds.first} />`}</Code>
-          </p>
+          </div>
         </div>
       </div>
       <br />  
