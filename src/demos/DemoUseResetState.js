@@ -24,7 +24,7 @@ export const DemoUseResetState = () => {
 
   return (
     <div>
-      <DemoHeader demoTxt='DemoUseGetSetState' useTxt='useGetSetState()' />
+      <DemoHeader demoTxt='DemoUseResetState' useTxt='useResetState()' />
       {/*---////--------------------------------------*/}
       <div> Fun: ( {st.fun} 👀 {st.fun} ) </div>
       <button onClick={ moreFun }>               More Fun   </button>{" "}
