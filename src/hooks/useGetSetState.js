@@ -2,22 +2,30 @@ import { useState } from "react"
 import { forEachInHash } from "../helpers/iterators.js"
 
 //-----------//////////////----------------------------o
-export const addGetSetProp = (obj, name, setter, val) => {
+export const addGetSetProp = (obj, name, initVal, setterFn) => {
+  obj.vals = obj.vals || {} // ensure a vals hash
+  obj.vals[name] = initVal // EX: obj.vals.life = 42 where name='life' and initVal=42
   Object.defineProperty(obj, name, {
     enumerable: true,
-    set: x => setter(x),
-    get: () => val
+    // set: function(x){this.vals[name] = x},//setter ? (x=>setter(x)) : (function(x){this.val = x}),
+    set: (x)=>{ setterFn && setterFn(x); obj.vals[name] = x },
+    get: function(){ return obj.vals[name] },
   })
 } // Usage: ----------
-//   var obj={};
-//   var nullProofFn = (x) => { if( x === null ){ this.val=x; return x; } else return this.val; }
-//   addGetSetProp( obj, 'fun', nullProofFn, 42 )
-//   obj.fun = null   //   <----   no change to val
-//   obj.fun = 6      //    <---   val correctly changes
-// Also great when paired with React hooks
-//   const [val,setter] = useState( initVal )
-//   addGetSetProp( obj, stateNm, setter, val )
-//
+  // var obj={};
+  // addGetSetProp( obj, 'fun', 42 )
+  // obj.fun   // 42
+  // obj.fun = 77
+  // obj.fun   // 77
+  // or
+  //   var nullProofFn = (x) => { if( x === null ){ this.val=x; return x; } else return this.val; }
+  //   addGetSetProp( obj, 'fun', 42, nullProofFn )
+  //   obj.fun = null   //   <----   no change to val
+  //   obj.fun = 6      //    <---   val correctly changes
+  // Also great when paired with React hooks
+  //   const [val,setter] = useState( initVal )
+  //   addGetSetProp( obj, stateNm, val, setter )
+  
 //-----------//////////////----------------------------o
 export const addGetProp = (obj, name, valFn) => {
   Object.defineProperty(obj, 'vals', { enumerable: false,
@@ -30,10 +38,9 @@ export const useGetSetState = hash => {
   //addGetProp( obj, 'vals', ()=>{ const {initVals, ...rest} = obj; return rest;  })
   const lockedUseState = useState
   forEachInHash(hash, ([key, initVal]) => {
-    const [value, setter] = lockedUseState(initVal)
-    addGetSetProp(obj, key, setter, value)
-    obj.vals[key] = value
     obj.initVals[key] = initVal
+    const [value, setter] = lockedUseState(initVal)
+    addGetSetProp(obj, key, value, setter)
   })
   return obj
 } // Usage: ------------------------------

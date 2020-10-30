@@ -29,7 +29,7 @@ export const useGetSetState = hash => {
   forEachInHash(hash, ([key, initVal]) => {
     obj.initVals[key] = initVal
     const [value, setter] = lockedUseState(initVal)
-    addGetSetProp(obj, key, setter, value)
+    addGetSetProp(obj, key, value, setter)
   })
   return obj
 }
