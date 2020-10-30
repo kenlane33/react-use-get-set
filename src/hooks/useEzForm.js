@@ -28,14 +28,14 @@ export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}), formProps
   let inputBinds = {}
   forEachInHash( inputs.vals, ([k,v])=>{ inputBinds[k] = makeInputBindForKey(k) })
   //------------------------------o
-  const bindForm = (Object.assign({
+  const formBind = (Object.assign({
     onSubmit: doSubmit 
   }, formProps||{} )) // merge props if present 
   //------------------------------o
-  return { inputs, doChange, doSubmit, inputBinds, bindForm}
+  return { inputs, doChange, doSubmit, inputBinds, formBind}
   
 }// Usage --------------------
-// const {doSubmit, bindInput, bindForm} = useEzForm(
+// const {doSubmit, bindInput, formBind} = useEzForm(
 //   { 
 //     first:'Gee', 
 //     last:['Willikars', {style:{color:'blue'} }]

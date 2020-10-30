@@ -22,7 +22,7 @@ export const DemoUseEzForm = () => {
       setSubmitted( JSON.stringify(x) )
     }
   )
-  const {inputs, doChange, doSubmit, inputBinds, bindForm} = ezForm
+  const {inputs, doChange, doSubmit, inputBinds, formBind} = ezForm
   // console.log( ezForm )
 
   const FormHeader = ({txt}) => (
@@ -126,7 +126,7 @@ const initVals = {
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
         <FormHeader txt="AutoForm: Manual props" />
-        <AutoForm fields={initVals} inputBinds={inputBinds} bindForm={bindForm}/>
+        <AutoForm fields={initVals} inputBinds={inputBinds} formBind={formBind}/>
       </div>
       <br />
       {/* ------------------------------------------ */}
