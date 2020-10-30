@@ -26,16 +26,9 @@ export const addGetSetProp = (obj, name, initVal, setterFn) => {
   //   const [val,setter] = useState( initVal )
   //   addGetSetProp( obj, stateNm, val, setter )
   
-//-----------//////////////----------------------------o
-export const addGetProp = (obj, name, valFn) => {
-  Object.defineProperty(obj, 'vals', { enumerable: false,
-    get: ()=>{ const {initVals, ...rest} = obj; return rest;  }
-  })
-}
 //-----------///////////////----------------------------o
 export const useGetSetState = hash => {
   const obj = { initVals:{}, vals:{} }
-  //addGetProp( obj, 'vals', ()=>{ const {initVals, ...rest} = obj; return rest;  })
   const lockedUseState = useState
   forEachInHash(hash, ([key, initVal]) => {
     obj.initVals[key] = initVal
