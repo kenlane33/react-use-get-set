@@ -5,7 +5,7 @@ import { DemoUseToggleState } from "./demos/DemoUseToggleState";
 import { DemoUseResetState } from "./demos/DemoUseResetState";
 import { DemoUseCheckboxState } from "./demos/DemoUseCheckboxState";
 import { DemoUseEzForm } from "./demos/DemoUseEzForm";
-import { DemoFetchGetPut } from "./demos/DemoFetchGetPut";
+// import { DemoFetchGetPut } from "./demos/DemoFetchGetPut";
 import { DemoAutoCrud } from "./demos/DemoAutoCrud";
 
 //import { forEachInHash } from "./helpers/iterators.js"

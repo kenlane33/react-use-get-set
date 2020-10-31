@@ -10,8 +10,8 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   </div>
 )
 //-------------------------------------o
-export const AutoForm = ({ bindForm, inputBinds, fields }) => (
-  <form {...bindForm}>
+export const AutoForm = ({ formBind, inputBinds, fields }) => (
+  <form {...formBind}>
     {ensureArr(fields, Object.keys(inputBinds)).map( k => (
       <Fielder key={k} label={k+': '} {...inputBinds[k]} />
     ))}

@@ -5,6 +5,7 @@ export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}), formProps
   //const [inputs, setInputs] = useState( initialValues || {} )
   const [initVals, hashOfInputProps] = unpackHashArrs(initialValues)
   const inputs = useGetSetState( initVals || {} )
+  const vals = inputs.vals
   //------------------------------o
   const doSubmit = (ev) => {
     ev && ev.preventDefault()
@@ -32,7 +33,7 @@ export const useEzForm = ( initialValues={}, submitCallback=( ()=>{}), formProps
     onSubmit: doSubmit 
   }, formProps||{} )) // merge props if present 
   //------------------------------o
-  return { inputs, doChange, doSubmit, inputBinds, formBind}
+  return { inputs, doChange, doSubmit, inputBinds, formBind, vals }
   
 }// Usage --------------------
 // const {doSubmit, bindInput, formBind} = useEzForm(
