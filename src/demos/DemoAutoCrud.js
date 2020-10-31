@@ -7,7 +7,7 @@ import { PrismCode } from "../components/PrismCode"
 //===========//////////////========================o
 export const DemoAutoCrud = () => {
   let [submittedTxt, setSubmitted] = useState('_')
-  let [seePw, setSeePw] = useState(true)
+  // let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
   const hash0 = {
     phone: '999-123-4567', // just an initial value
@@ -65,8 +65,8 @@ const hash = {
       <br />  
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
-        <FormHeader txt="AutoCrud plus specific fields only"/>
-        <AutoCrud hash={hash} fields={['last','first']} />
+        <FormHeader txt="AutoCrud plus specific, ordered fields only"/>
+        <AutoCrud {...{table:'user', hash, doSubmitted, fields:['last','first']}}  />
       </div>
       <br />
       {/* ------------------------------------------ */}

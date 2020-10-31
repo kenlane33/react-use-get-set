@@ -59,20 +59,21 @@ const AutoFormEdit = (props) => {
   const ezForm = useEzForm(
     hash,
     (x)=>{
-      console.log(x)
+      log(x)
       doSubmitted(x)
       setVerb('show...')
       setTimeout( (res)=>{
         log('---------------fetch PUT Done---------------');
         setVerb('show')
       }, 2000 )
+      log(`From:${verb} do fetchPut( /${table}/${id}, hash, (res)=>setVerb('show') )`)
       //fetchPut( `/${table}/${id}`, hash, (res)=>setVerb('show') )
     }
   )
-  const {inputs, doChange, doSubmit, inputBinds, formBind} = ezForm
+  // const {inputs, doChange, doSubmit, inputBinds, formBind} = ezForm
   const SubmitComp = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="">Save</a>
   return (
-    <AutoForm {...ezForm} SubmitComp={SubmitComp}/>
+    <AutoForm {...{...ezForm, SubmitComp, fields}}/>
   )
 }
 
@@ -90,22 +91,25 @@ const LoadingThang = ()=>(
 
 //-------------------------------------o
 export const AutoCrudDraw = (props) => {
-  console.log('AutoCrudDraw', props)
+  log('AutoCrudDraw', props)
   const { table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
   const [loading, theVerb] = loadingFromVerb(verb)
 
-  if (theVerb=='edit') {
+  if (theVerb==='edit') {
 
-    return <AutoFormEdit {...{...props, doSubmitted}} />
+    return ( <>
+        <AutoFormEdit {...{...props, doSubmitted, id}} />
+        <CrudLink verb="cancel"   table={table} func={()=>{log('Clicked CANCEL!');   setVerb('show') }}/>
+    </> )
 
   } else
   if (theVerb==='show') { return (
       <div>
-        <AutoShowHash hash={hash} />
+        <AutoShowHash {...{hash, fields}} />
         {loading ? <LoadingThang/> : 
           <>
-            <CrudLink verb="edit"   table={table} func={()=>{console.log('Clicked EDIT!');   setVerb('edit') }}/>
-            <CrudLink verb="delete" table={table} func={()=>{console.log('Clicked Delete!'); setVerb('deleted') }}/>
+            <CrudLink verb="edit"   table={table} func={()=>{log('Clicked EDIT!');   setVerb('edit') }}/>
+            <CrudLink verb="delete" table={table} func={()=>{log('Clicked DELETE!'); setVerb('deleted') }}/>
           </>
         }
       </div>
@@ -114,7 +118,7 @@ export const AutoCrudDraw = (props) => {
     <div>
       {fields.map((x,i)=><br key={i}/>)}
       <div><b>Deleted</b></div>
-      <CrudLink verb="undo"   table={table} func={()=>{console.log('Clicked UNDO!');   setVerb('show') }}/>
+      <CrudLink verb="undo"   table={table} func={()=>{log('Clicked UNDO!');   setVerb('show') }}/>
     </div>
   )}
 }
