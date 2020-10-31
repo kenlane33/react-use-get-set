@@ -62,13 +62,17 @@ const AutoFormEdit = (props) => {
       console.log(x)
       doSubmitted(x)
       setVerb('show...')
-      setTimeout( (res)=>setVerb('show'), 2000 )
+      setTimeout( (res)=>{
+        log('---------------fetch PUT Done---------------');
+        setVerb('show')
+      }, 2000 )
       //fetchPut( `/${table}/${id}`, hash, (res)=>setVerb('show') )
     }
   )
   const {inputs, doChange, doSubmit, inputBinds, formBind} = ezForm
+  const SubmitComp = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="">Save</a>
   return (
-    <AutoForm {...ezForm} />
+    <AutoForm {...ezForm} SubmitComp={SubmitComp}/>
   )
 }
 
@@ -91,7 +95,9 @@ export const AutoCrudDraw = (props) => {
   const [loading, theVerb] = loadingFromVerb(verb)
 
   if (theVerb=='edit') {
+
     return <AutoFormEdit {...{...props, doSubmitted}} />
+
   } else
   if (theVerb==='show') { return (
       <div>

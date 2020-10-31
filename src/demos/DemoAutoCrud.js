@@ -9,12 +9,13 @@ export const DemoAutoCrud = () => {
   let [submittedTxt, setSubmitted] = useState('_')
   let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
-  const hash = {
+  const hash0 = {
     phone: '999-123-4567', // just an initial value
     first:['Gee', {style:{color:'blue'}, label:'First name==>'}], // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.first
     last:'Willikars',      // just an initial value
     pw: ['12345', {type:'password'}] // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
   }
+  const [hash, setHash] = useState(hash0)
 
   const FormHeader = ({txt}) => (
     <div style={{padding:10, backgroundColor:'#eee', marginBottom:10}}>
@@ -26,6 +27,7 @@ export const DemoAutoCrud = () => {
 
   const doSubmitted = (hash) => {
     setSubmitted( JSON.stringify(hash))
+    setHash(hash)
   }
 
   // const initValsCode = `const initVals = ${JSON.stringify(initVals)}`
