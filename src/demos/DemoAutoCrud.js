@@ -6,7 +6,7 @@ import { PrismCode } from "../components/PrismCode"
 
 //===========//////////////========================o
 export const DemoAutoCrud = () => {
-  let [submittedTxt, setSubmitted] = useState('_')
+  let [submittedTxt, setSubmittedTxt] = useState('_')
   // let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
   const hash0 = {
@@ -26,7 +26,7 @@ export const DemoAutoCrud = () => {
   const Code = (p) => <pre style={{display:'inline', fontWeight:700, fontSize:17}}>{p.children}</pre>
 
   const doSubmitted = (hash) => {
-    setSubmitted( JSON.stringify(hash))
+    setSubmittedTxt( JSON.stringify(hash) )
     setHash(hash)
   }
 
@@ -67,11 +67,6 @@ const hash = {
       <div style={{border:'1px solid grey'}}>
         <FormHeader txt="AutoCrud plus specific, ordered fields only"/>
         <AutoCrud {...{table:'user', hash, doSubmitted, fields:['last','first']}}  />
-      </div>
-      <br />
-      {/* ------------------------------------------ */}
-      <div style={{border:'1px solid grey'}}>
-        <FormHeader txt="AutoForm: Manual props" />
       </div>
       <br />
       {/* ------------------------------------------ */}

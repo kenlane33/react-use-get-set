@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 // import { ensureArr } from '../helpers/iterators'
 import {AutoForm} from './AutoForm'
 import AutoShowHash from './AutoShowHash'
@@ -14,25 +14,44 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
     </label><br />
   </div>
 )
-const fetchPut = ( url, hash, func, options={} ) => (
-  fetchify(url, hash, func, {...options, method:'PUT'} )
-)
 
-const doResponseCheck = (res, url, func )=>{ 
-  if (res.ok) func(res)
+
+const doResponseCheck = (res, url, callbackFn )=>{ 
+  if (res.ok) callbackFn(res)
   else throw new Error(`ERROR: url:${url} status:${res.statusText} `)
 }
-const fetchify = ( url, hash, func, options={} ) => (
-  fetch( url, { body: JSON.stringify(hash), ...options } )
+const fetchify = ( url, hash, callbackFn, fetchFn, options={} ) => (
+  fetchFn( url, { body: hash&&JSON.stringify(hash), ...options } )
   .then( (res)=>{ 
-    doResponseCheck(res, url, func )
+    doResponseCheck(res, url, callbackFn )
   } )
   .catch( (err)=>{throw(err)} )
+)
+const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>new Promise(
+  resolve => setTimeout(resolve, secs*1000, 
+    {
+      ok:true,
+      body:JSON.stringify(bodyAsHash),
+      json:()=>bodyAsHash // returns hash
+    }
+  )
+);
+
+const fetchGet = (url, callbackFn, fetchFn=fetch, options={}) => (
+  fetchify(url, undefined, callbackFn, fetchFn, {...options, method:'GET'} )
+)
+const fetchPut = ( url, hash, callbackFn, fetchFn=fetch, options={} ) => (
+  fetchify(url, hash, callbackFn, fetchFn, {...options, method:'PUT'} )
+)
+
+const fetchDelete = ( url, callbackFn, fetchFn=fetch, options={} ) => (
+  fetchify(url, undefined, callbackFn, fetchFn, {...options, method:'DELETE'} )
 )
 
 const verbBind = (verb, table, func) => ({ 
   href: `/${table}/${verb}`,
   onClick: (ev)=>{ ev.preventDefault()
+    log(`CLICK [[[${verb}]]]`)
     func(table,verb,ev)
   },
 })
@@ -48,36 +67,39 @@ const CrudLink = ({verb, table, func}) => (
 )
 
 export const AutoCrud = (props) => {
-  const [verb, doSetVerb] = useState(props.verb||'show')
+  const [verb, doSetVerb] = useState(props.verb||'loading')
+  const [gettedHash, setGettedHash] = useState({vals:{}})
+  useEffect(()=>{
+    fetchGet(`/${props.table}/${props.id}`, (res)=>{
+      setGettedHash( res.json() )
+      setVerb('show')
+    }, fakeFetch(2, props.hash)) // }, fetch )
+  },[ props.hash, props.id, props.table ]) // Dependencies
   const setVerb = (x)=>{ doSetVerb(x); log(`setVerb(${x})`) }
   const {doSubmitted} = props
-  return <AutoCrudDraw {...{...props, verb, setVerb, doSubmitted}} />
+  return <AutoCrudDraw {...{...props, hash:gettedHash, verb, setVerb, doSubmitted}} />
 }
 
 const AutoFormEdit = (props) => {
   const { table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
   const ezForm = useEzForm(
     hash,
-    (x)=>{
-      log(x)
-      doSubmitted(x)
+    (newHash)=>{
+      log('Edit.Submitted',newHash)
+      doSubmitted(newHash)
       setVerb('show...')
-      setTimeout( (res)=>{
-        log('---------------fetch PUT Done---------------');
-        setVerb('show')
-      }, 2000 )
+      fetchPut( `/${table}/${id}`, newHash, (res)=>setVerb('show'), fakeFetch(2,null) )
       log(`From:${verb} do fetchPut( /${table}/${id}, hash, (res)=>setVerb('show') )`)
-      //fetchPut( `/${table}/${id}`, hash, (res)=>setVerb('show') )
     }
   )
   // const {inputs, doChange, doSubmit, inputBinds, formBind} = ezForm
-  const SubmitComp = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="">Save</a>
+  const SubmitComp = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="#">Save</a>
   return (
     <AutoForm {...{...ezForm, SubmitComp, fields}}/>
   )
 }
 
-const loadingFromVerb = (verb) => (
+const parseLoadingFromVerb = (verb) => (
   [ /\.\.\./.test(verb), verb.replace('...','')]
 )
 
@@ -93,32 +115,52 @@ const LoadingThang = ()=>(
 export const AutoCrudDraw = (props) => {
   log('AutoCrudDraw', props)
   const { table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
-  const [loading, theVerb] = loadingFromVerb(verb)
-
-  if (theVerb==='edit') {
-
-    return ( <>
-        <AutoFormEdit {...{...props, doSubmitted, id}} />
-        <CrudLink verb="cancel"   table={table} func={()=>{log('Clicked CANCEL!');   setVerb('show') }}/>
-    </> )
-
-  } else
-  if (theVerb==='show') { return (
+  const [loading, theVerb] = parseLoadingFromVerb(verb)
+  const setVerbLater = (verb, secs=2) => { setTimeout(()=>setVerb(verb), secs*1000) }
+  
+  if (theVerb==='loading') { return ( // <<<<<<<<<<<<<<<<<<<<<< LOADING
+    <div><LoadingThang/></div>
+  )} else
+  if (theVerb==='edit') { return ( // <<<<<<<<<<<<<<<<<<<<<< EDIT
+    <>
+      <AutoFormEdit {...{...props, doSubmitted, id}} />
+      <CrudLink verb="cancel"   table={table} func={()=>{setVerb('show') }}/>
+    </> 
+  )} else
+  if (theVerb==='show') { return ( // <<<<<<<<<<<<<<<<<<<<<< SHOW
       <div>
         <AutoShowHash {...{hash, fields}} />
         {loading ? <LoadingThang/> : 
           <>
-            <CrudLink verb="edit"   table={table} func={()=>{log('Clicked EDIT!');   setVerb('edit') }}/>
-            <CrudLink verb="delete" table={table} func={()=>{log('Clicked DELETE!'); setVerb('deleted') }}/>
+            <CrudLink verb="edit"   table={table} func={()=>{ setVerb('edit') }}/>
+            <CrudLink verb="delete" table={table} func={()=>{ 
+              setVerb('deleting')
+              setVerbLater('deleted')
+              fetchDelete(`/${table}/${id}`,(res)=>{
+                if (res.ok) setVerb('deleted') 
+                else setVerb('deletedERR')
+              }, fakeFetch(2,null))
+            }}/>
           </>
         }
       </div>
   )} else
-  if (theVerb==='deleted') { return (
+  if (theVerb==='deleting') { return ( // <<<<<<<<<<<<<<<<<<<<<< DELETING
     <div>
-      {fields.map((x,i)=><br key={i}/>)}
-      <div><b>Deleted</b></div>
-      <CrudLink verb="undo"   table={table} func={()=>{log('Clicked UNDO!');   setVerb('show') }}/>
+      {/*fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
+      <LoadingThang/>
+      <div><b>Deleting</b></div>
+      <CrudLink verb="undo" table={table} func={()=>{setVerb('show') }}/>
     </div>
+  )}
+  if (theVerb==='deleted') { return (  // <<<<<<<<<<<<<<<<<<<<<< DELETED
+    <div>
+      {fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
+      <div><b>Deleted</b></div>
+      <CrudLink verb="undo" table={table} func={()=>{setVerb('show') }}/>
+    </div>
+  )}
+  else { return (
+    <div>{verb}</div>
   )}
 }
