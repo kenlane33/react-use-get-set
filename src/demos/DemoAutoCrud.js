@@ -51,8 +51,10 @@ const hash = {
             </PrismCode>
             </div>
           <div style={leftStl}>
-            Behold the AutoCrud!!!:<br />
-            <Code>{`<AutoCrud hash={hash} />`}</Code>
+            <br />
+            Behold the AutoCrud!!!:
+            <br />
+            <br />
           </div>
         </div>
       </div>
@@ -60,12 +62,16 @@ const hash = {
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
         <FormHeader txt="Fully automatic AutoCrud" />
+        <Code>{`<AutoCrud hash={hash} />`}</Code>
+        <br/><br/>
         <AutoCrud {...{table:'user', hash, doSubmitted}} />
       </div>
       <br />  
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
-        <FormHeader txt="AutoCrud plus specific, ordered fields only"/>
+        <FormHeader txt="AutoCrud with ordered field subset of hash"/>
+        <Code>{`<AutoCrud hash={hash} fields={['last','first']}/>`}</Code>
+        <br/><br/>
         <AutoCrud {...{table:'user', hash, doSubmitted, fields:['last','first']}}  />
       </div>
       <br />
