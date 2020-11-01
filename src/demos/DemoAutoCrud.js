@@ -64,7 +64,13 @@ const hash = {
         <FormHeader txt="Fully automatic AutoCrud" />
         <Code>{`<AutoCrud hash={hash} />`}</Code>
         <br/><br/>
-        <AutoCrud {...{table:'user', hash, doSubmitted}} />
+        <AutoCrud {...{
+          table:'users', 
+          hash, 
+          doSubmitted, 
+          id: 123,
+          rootUrl:'https://fakestoreapi.com/'
+        }}/>
       </div>
       <br />  
       {/* ------------------------------------------ */}
@@ -72,7 +78,14 @@ const hash = {
         <FormHeader txt="AutoCrud with ordered field subset of hash"/>
         <Code>{`<AutoCrud hash={hash} fields={['last','first']}/>`}</Code>
         <br/><br/>
-        <AutoCrud {...{table:'user', hash, doSubmitted, fields:['last','first']}}  />
+        <AutoCrud {...{
+          table:'users', 
+          hash, 
+          doSubmitted, 
+          fields:['last','first'],
+          id: 456,
+          rootUrl:'https://fakestoreapi.com/'
+        }}/>
       </div>
       <br />
       {/* ------------------------------------------ */}

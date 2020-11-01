@@ -20,32 +20,33 @@ const doResponseCheck = (res, url, callbackFn )=>{
   if (res.ok) callbackFn(res)
   else throw new Error(`ERROR: url:${url} status:${res.statusText} `)
 }
-const fetchify = ( url, hash, callbackFn, fetchFn, options={} ) => (
+const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => (
   fetchFn( url, { body: hash&&JSON.stringify(hash), ...options } )
   .then( (res)=>{ 
     doResponseCheck(res, url, callbackFn )
   } )
   .catch( (err)=>{throw(err)} )
 )
-const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>new Promise(
-  resolve => setTimeout(resolve, secs*1000, 
-    {
-      ok:true,
-      body:JSON.stringify(bodyAsHash),
-      json:()=>bodyAsHash // returns hash
-    }
-  )
-);
+const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>{
+  log('fakeFetch() ',url)
+  return new Promise( (fn) => setTimeout( fn, secs*1000, 
+      {
+        ok:true,
+        body:JSON.stringify(bodyAsHash),
+        json:()=>bodyAsHash // returns hash
+      }
+  ))
+}
 
-const fetchGet = (url, callbackFn, fetchFn=fetch, options={}) => (
-  fetchify(url, undefined, callbackFn, fetchFn, {...options, method:'GET'} )
+const fetchGet = (url, callbackFn, options={}, fetchFn=fetch ) => (
+  fetchify(url, undefined, callbackFn, {...options, method:'GET'}, fetchFn )
 )
-const fetchPut = ( url, hash, callbackFn, fetchFn=fetch, options={} ) => (
-  fetchify(url, hash, callbackFn, fetchFn, {...options, method:'PUT'} )
+const fetchPut = ( url, hash, callbackFn, options={}, fetchFn=fetch ) => (
+  fetchify(url, hash, callbackFn, {...options, method:'PUT'}, fetchFn )
 )
 
-const fetchDelete = ( url, callbackFn, fetchFn=fetch, options={} ) => (
-  fetchify(url, undefined, callbackFn, fetchFn, {...options, method:'DELETE'} )
+const fetchDelete = ( url, callbackFn, options={}, fetchFn=fetch ) => (
+  fetchify(url, undefined, callbackFn, {...options, method:'DELETE'}, fetchFn )
 )
 
 const verbBind = (verb, table, func) => ({ 
@@ -65,18 +66,34 @@ const CrudLink = ({verb, table, func}) => (
       {titleCase(verb)}
   </a>
 )
+export const curdUrlGen = (rootUrl, table, id) => {
+  const base = `${rootUrl}${table}`
+  const baseId = base + `/${id||''}`
+  return {
+    index: base,
+    show: baseId,
+    edit: baseId,
+    update: baseId,
+    delete: baseId,
+  }
+}
 
 export const AutoCrud = (props) => {
+  const {rootUrl='/', table, hash, id, doSubmitted} = props
   const [verb, doSetVerb] = useState(props.verb||'loading')
   const [gettedHash, setGettedHash] = useState({vals:{}})
-  useEffect(()=>{
-    fetchGet(`/${props.table}/${props.id}`, (res)=>{
+  const crudUrlFor = curdUrlGen(rootUrl, table, id)
+  const setVerb = (x)=>{ doSetVerb(x); log(`setVerb(${x})`) }
+
+  useEffect(()=>{ // <<<<<<<<<<<<< Once! 
+
+    fetchGet( crudUrlFor.show, (res)=>{
       setGettedHash( res.json() )
       setVerb('show')
-    }, fakeFetch(2, props.hash)) // }, fetch )
-  },[ props.hash, props.id, props.table ]) // Dependencies
-  const setVerb = (x)=>{ doSetVerb(x); log(`setVerb(${x})`) }
-  const {doSubmitted} = props
+    }, {}, fakeFetch(2, hash)) // }, fetch )
+
+  },[ hash, id ]) // <<<<< Dependencies
+
   return <AutoCrudDraw {...{...props, hash:gettedHash, verb, setVerb, doSubmitted}} />
 }
 
@@ -87,8 +104,8 @@ const AutoFormEdit = (props) => {
     (newHash)=>{
       log('Edit.Submitted',newHash)
       doSubmitted(newHash)
-      setVerb('show...')
-      fetchPut( `/${table}/${id}`, newHash, (res)=>setVerb('show'), fakeFetch(2,null) )
+      setVerb('update')
+      fetchPut( `/${table}/${id}`, newHash, (res)=>setVerb('show'), {}, fakeFetch(2,null) )
       log(`From:${verb} do fetchPut( /${table}/${id}, hash, (res)=>setVerb('show') )`)
     }
   )
@@ -114,10 +131,11 @@ const LoadingThang = ()=>(
 //-------------------------------------o
 export const AutoCrudDraw = (props) => {
   log('AutoCrudDraw', props)
-  const { table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
+  const { rootUrl, table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
   const [loading, theVerb] = parseLoadingFromVerb(verb)
-  const setVerbLater = (verb, secs=2) => { setTimeout(()=>setVerb(verb), secs*1000) }
-  
+  //const setVerbLater = (verb, secs=2) => { setTimeout(()=>setVerb(verb), secs*1000) }
+  const crudUrlFor = curdUrlGen(rootUrl, table, id)
+
   if (theVerb==='loading') { return ( // <<<<<<<<<<<<<<<<<<<<<< LOADING
     <div><LoadingThang/></div>
   )} else
@@ -127,19 +145,19 @@ export const AutoCrudDraw = (props) => {
       <CrudLink verb="cancel"   table={table} func={()=>{setVerb('show') }}/>
     </> 
   )} else
-  if (theVerb==='show') { return ( // <<<<<<<<<<<<<<<<<<<<<< SHOW
+  if (theVerb==='show' || theVerb==='update') { return ( // <<<<<<<<<<<<<<<<<<<<<< SHOW
       <div>
         <AutoShowHash {...{hash, fields}} />
-        {loading ? <LoadingThang/> : 
+        {(theVerb==='update') ? <LoadingThang/> : 
           <>
             <CrudLink verb="edit"   table={table} func={()=>{ setVerb('edit') }}/>
             <CrudLink verb="delete" table={table} func={()=>{ 
               setVerb('deleting')
-              setVerbLater('deleted')
-              fetchDelete(`/${table}/${id}`,(res)=>{
+              //setVerbLater('deleted')
+              fetchDelete( crudUrlFor.delete, /* and then */ (res)=>{
                 if (res.ok) setVerb('deleted') 
                 else setVerb('deletedERR')
-              }, fakeFetch(2,null))
+              }, {}, fakeFetch(2,null))
             }}/>
           </>
         }
@@ -161,6 +179,6 @@ export const AutoCrudDraw = (props) => {
     </div>
   )}
   else { return (
-    <div>{verb}</div>
+    <div>Ummmm... {verb}</div>
   )}
 }
