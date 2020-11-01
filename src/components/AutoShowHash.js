@@ -1,7 +1,7 @@
 import React from "react"
 // import { ensureArr } from '../helpers/iterators'
 import { unpackHashArrs } from '../helpers/iterators.js'
-const {log} = console
+// const {log} = console
 
 const titleCase = ([firstLetter, ...rest]) => (firstLetter.toUpperCase() + rest.join(''))
 
@@ -20,7 +20,7 @@ export const AutoShowHash = ({ hash, fields=Object.keys(hash), KeyValueComp=Simp
   return (
     <div>
       {fields.map( k => {
-        log(`<AutoShowHash hash['${k}']=${hash2[k]}`)
+        //log(`<AutoShowHash hash['${k}']=${hash2[k]}`)
         return <KeyValueComp key={k} label={k} value={hash2[k]} />
       })}
     </div>

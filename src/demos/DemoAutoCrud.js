@@ -74,7 +74,7 @@ const hash = {
       </div>
       <br />  
       {/* ------------------------------------------ */}
-      <div style={{border:'1px solid grey'}}>
+      {/* <div style={{border:'1px solid grey'}}>
         <FormHeader txt="AutoCrud with ordered field subset of hash"/>
         <Code>{`<AutoCrud hash={hash} fields={['last','first']}/>`}</Code>
         <br/><br/>
@@ -87,7 +87,7 @@ const hash = {
           rootUrl:'https://fakestoreapi.com/'
         }}/>
       </div>
-      <br />
+      <br /> */}
       {/* ------------------------------------------ */}
       <div>Submitted data:</div>
       <pre style={{margin:0, fontSize:10}}>

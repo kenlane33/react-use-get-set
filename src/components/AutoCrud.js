@@ -79,6 +79,7 @@ export const curdUrlGen = (rootUrl, table, id) => {
 }
 
 export const AutoCrud = (props) => {
+
   const {rootUrl='/', table, hash, id, doSubmitted} = props
   const [verb, doSetVerb] = useState(props.verb||'loading')
   const [gettedHash, setGettedHash] = useState({vals:{}})
@@ -92,33 +93,34 @@ export const AutoCrud = (props) => {
       setVerb('show')
     }, {}, fakeFetch(2, hash)) // }, fetch )
 
-  },[ hash, id ]) // <<<<< Dependencies
+  },[ hash, id, crudUrlFor.show ]) // <<<<< Dependencies
 
   return <AutoCrudDraw {...{...props, hash:gettedHash, verb, setVerb, doSubmitted}} />
 }
 
 const AutoFormEdit = (props) => {
-  const { table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
+  const { rootUrl, table, id, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
+  const crudUrlFor = curdUrlGen(rootUrl, table, id)
+
   const ezForm = useEzForm(
     hash,
     (newHash)=>{
-      log('Edit.Submitted',newHash)
+      log('useEzForm.SubmitCallbackFn() ',newHash)
       doSubmitted(newHash)
       setVerb('update')
-      fetchPut( `/${table}/${id}`, newHash, (res)=>setVerb('show'), {}, fakeFetch(2,null) )
-      log(`From:${verb} do fetchPut( /${table}/${id}, hash, (res)=>setVerb('show') )`)
+      fetchPut( crudUrlFor.update, newHash, (res)=>setVerb('show'), {}, fakeFetch(2,null) )
     }
   )
-  // const {inputs, doChange, doSubmit, inputBinds, formBind} = ezForm
-  const SubmitComp = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="#">Save</a>
+  const SubmitLink = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="/">Save</a>
+
   return (
-    <AutoForm {...{...ezForm, SubmitComp, fields}}/>
+    <AutoForm {...{...ezForm, SubmitLink, fields}}/>
   )
 }
 
-const parseLoadingFromVerb = (verb) => (
-  [ /\.\.\./.test(verb), verb.replace('...','')]
-)
+// const parseLoadingFromVerb = (verb) => (
+//   [ /\.\.\./.test(verb), verb.replace('...','')]
+// )
 
 const LoadingThang = ()=>(
   <div className="spinner">
@@ -132,23 +134,23 @@ const LoadingThang = ()=>(
 export const AutoCrudDraw = (props) => {
   log('AutoCrudDraw', props)
   const { rootUrl, table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
-  const [loading, theVerb] = parseLoadingFromVerb(verb)
+  // const [loading, verb] = parseLoadingFromVerb(verb)
   //const setVerbLater = (verb, secs=2) => { setTimeout(()=>setVerb(verb), secs*1000) }
   const crudUrlFor = curdUrlGen(rootUrl, table, id)
 
-  if (theVerb==='loading') { return ( // <<<<<<<<<<<<<<<<<<<<<< LOADING
+  if (verb==='loading') { return ( // <<<<<<<<<<<<<<<<<<<<<< LOADING
     <div><LoadingThang/></div>
   )} else
-  if (theVerb==='edit') { return ( // <<<<<<<<<<<<<<<<<<<<<< EDIT
+  if (verb==='edit') { return ( // <<<<<<<<<<<<<<<<<<<<<< EDIT
     <>
       <AutoFormEdit {...{...props, doSubmitted, id}} />
       <CrudLink verb="cancel"   table={table} func={()=>{setVerb('show') }}/>
     </> 
   )} else
-  if (theVerb==='show' || theVerb==='update') { return ( // <<<<<<<<<<<<<<<<<<<<<< SHOW
+  if (verb==='show' || verb==='update') { return ( // <<<<<<<<<<<<<<<<<<<<<< SHOW
       <div>
         <AutoShowHash {...{hash, fields}} />
-        {(theVerb==='update') ? <LoadingThang/> : 
+        {(verb==='update') ? <LoadingThang/> : 
           <>
             <CrudLink verb="edit"   table={table} func={()=>{ setVerb('edit') }}/>
             <CrudLink verb="delete" table={table} func={()=>{ 
@@ -163,7 +165,7 @@ export const AutoCrudDraw = (props) => {
         }
       </div>
   )} else
-  if (theVerb==='deleting') { return ( // <<<<<<<<<<<<<<<<<<<<<< DELETING
+  if (verb==='deleting') { return ( // <<<<<<<<<<<<<<<<<<<<<< DELETING
     <div>
       {/*fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
       <LoadingThang/>
@@ -171,7 +173,7 @@ export const AutoCrudDraw = (props) => {
       <CrudLink verb="undo" table={table} func={()=>{setVerb('show') }}/>
     </div>
   )}
-  if (theVerb==='deleted') { return (  // <<<<<<<<<<<<<<<<<<<<<< DELETED
+  if (verb==='deleted') { return (  // <<<<<<<<<<<<<<<<<<<<<< DELETED
     <div>
       {fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
       <div><b>Deleted</b></div>

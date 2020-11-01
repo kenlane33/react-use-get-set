@@ -10,11 +10,11 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   </div>
 )
 //-------------------------------------o
-export const AutoForm = ({ formBind, inputBinds, fields, SubmitComp }) => (
+export const AutoForm = ({ formBind, inputBinds, fields, SubmitLink }) => (
   <form {...formBind}>
     {ensureArr(fields, Object.keys(inputBinds)).map( k => (
       <Fielder key={k} label={k+': '} {...inputBinds[k]} />
     ))}
-    {SubmitComp ? <SubmitComp onClick={formBind.onSubmit}/> : <input type="submit" value="Submit" />}
+    {SubmitLink ? <SubmitLink onClick={formBind.onSubmit}/> : <input type="submit" value="Submit" />}
   </form>
 )
