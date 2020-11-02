@@ -15,60 +15,29 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   </div>
 )
 
-const checkFetchOk = ( res, url )=>(
-  ( res.ok ) ? 
-  Promise.resolve(res) 
-  :
-  Promise.reject( `ERROR: url:${url} status:${res.statusText} `)
-)
-
-
-const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => {
+const fetchify = async ( url, hash, callbackFn, options={}, fetchFn ) => {
   fetchFn = fetch
   log('fetchify() ', 'url:', url, 'hash:', hash, 'opts:', options)
-  return (
-    fetchFn( url, { body: hash&&JSON.stringify(hash), ...options } )
-      // .then( resp => resp.ok ? resp : {json:()=>{return{bogus:1}} } )
-      .then( checkFetchOk )
-      .then( resp => {
-        log('fetchify.resp:', resp)
-        return resp.json()
-      })
-      .then( json => {
-        log( 'fetchify.json:', json)
-        callbackFn(json)
-      }) 
-      .catch( (err)=>{
-        throw(err)
-      } )
-  )
+  try {
+    const fetchOpts = { body: hash&&JSON.stringify(hash), ...options }
+    const res = await fetchFn(url, fetchOpts);
+    if (!res.ok) throw new Error(`ERROR: url:${url} status:${res.statusText}/${res.status}`);
+    const dataHash = await res.json();
+    callbackFn(dataHash)
+  } catch (ex) {
+    throw new Error(`ERROR: url:${url} | ${ex.message} | stack: ${ex.stack}`)
+  }
 }
-
-
-// https://attacomsian.com/blog/javascript-fetch-api
-// const fetchUsers = async () => {
-//   try {
-//       const res = await fetch('https://reqres.in/api/users');
-//       if (!res.ok) {
-//           throw new Error(res.status);
-//       }
-//       const data = await res.json();
-//       console.log(data);
-//   } catch (error) {
-//       console.log(error);
-//   }
-// }
-
 
 const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>{
   log('fakeFetch() ',url)
   return new Promise( (fn) => setTimeout( fn, secs*1000, 
-      {
-        ok:true,
-        statusText:'OK',
-        body:JSON.stringify(bodyAsHash),
-        json:()=>bodyAsHash // returns hash
-      }
+    {
+      ok:true,
+      statusText:'OK',
+      body:JSON.stringify(bodyAsHash),
+      json:()=>bodyAsHash // returns hash
+    }
   ))
 }
 
