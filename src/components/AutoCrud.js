@@ -15,11 +15,11 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   </div>
 )
 
-
 const doResponseCheck = (res, url, callbackFn )=>{ 
   if (res.ok) callbackFn(res)
   else throw new Error(`ERROR: url:${url} status:${res.statusText} `)
 }
+
 const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => (
   fetchFn( url, { body: hash&&JSON.stringify(hash), ...options } )
   .then( (res)=>{ 
@@ -27,11 +27,13 @@ const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => (
   } )
   .catch( (err)=>{throw(err)} )
 )
+
 const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>{
   log('fakeFetch() ',url)
   return new Promise( (fn) => setTimeout( fn, secs*1000, 
       {
         ok:true,
+        statusText:'OK',
         body:JSON.stringify(bodyAsHash),
         json:()=>bodyAsHash // returns hash
       }
@@ -70,11 +72,13 @@ export const curdUrlGen = (rootUrl, table, id) => {
   const base = `${rootUrl}${table}`
   const baseId = base + `/${id||''}`
   return {
-    index: base,
-    show: baseId,
-    edit: baseId,
+    index:   base,
+    new:     base+'/new',
+    create:  base, 
+    show:   baseId,
+    edit:   baseId+'/edit',
     update: baseId,
-    delete: baseId,
+    destroy:baseId,
   }
 }
 
@@ -153,19 +157,19 @@ export const AutoCrudDraw = (props) => {
         {(verb==='update') ? <LoadingThang/> : 
           <>
             <CrudLink verb="edit"   table={table} func={()=>{ setVerb('edit') }}/>
-            <CrudLink verb="delete" table={table} func={()=>{ 
-              setVerb('deleting')
-              //setVerbLater('deleted')
-              fetchDelete( crudUrlFor.delete, /* and then */ (res)=>{
-                if (res.ok) setVerb('deleted') 
-                else setVerb('deletedERR')
+            <CrudLink verb="destroy" table={table} func={()=>{ 
+              setVerb('destroying')
+              //setVerbLater('destroyed')
+              fetchDelete( crudUrlFor.destroy, /* and then */ (res)=>{
+                if (res.ok) setVerb('destroyed') 
+                else setVerb('destroyedERR')
               }, {}, fakeFetch(2,null))
             }}/>
           </>
         }
       </div>
   )} else
-  if (verb==='deleting') { return ( // <<<<<<<<<<<<<<<<<<<<<< DELETING
+  if (verb==='destroying') { return ( // <<<<<<<<<<<<<<<<<<<<<< DELETING
     <div>
       {/*fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
       <LoadingThang/>
@@ -173,7 +177,7 @@ export const AutoCrudDraw = (props) => {
       <CrudLink verb="undo" table={table} func={()=>{setVerb('show') }}/>
     </div>
   )}
-  if (verb==='deleted') { return (  // <<<<<<<<<<<<<<<<<<<<<< DELETED
+  if (verb==='destroyed') { return (  // <<<<<<<<<<<<<<<<<<<<<< DELETED
     <div>
       {fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
       <div><b>Deleted</b></div>
