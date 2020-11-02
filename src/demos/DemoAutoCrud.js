@@ -66,7 +66,7 @@ const hash = {
         <br/><br/>
         <AutoCrud {...{
           table:'users', 
-          hash, 
+          // hash, 
           doSubmitted, 
           id: 1,
           rootUrl:'https://fakestoreapi.com/'

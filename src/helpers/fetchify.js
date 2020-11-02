@@ -4,22 +4,24 @@ const {log,error} = console;
 const fetchify = async (url, hash, callbackFn, options = {}, fetchFn) => {
   fetchFn = fetch;
   log('fetchify() ', 'url:', url, 'hash:', hash, 'opts:', options);
-  // try {
-  {
+  try {
     const fetchOpts = { body: hash && JSON.stringify(hash), ...options };
     const resp = await fetchFn(url, fetchOpts);
+    // const resp = {...resp0, ok:false}
     if (!resp.ok){
-      const errMsg = `ERROR: url:${url} status:${resp.statusText}/${resp.status}`
-      error(errMsg)
-      callbackFn(hash, resp, errMsg) // set it back to original hash
+      log('fetchify.ERROR', resp)
+      throw(resp)
     } else {
       const respHash = await resp.json()
       callbackFn(respHash, resp) // TEST: {...resp, ok:false} )
     }
   }
-  // catch (ex) {
-  //   throw new Error(`ERROR: url:${url} | ${ex.message} | stack: ${ex.stack}`);
-  // }
+  catch (resp) {
+    error(resp)
+    callbackFn({error:`${resp.name} / ${resp.message}`}, resp) // set it back to original hash
+    // throw new Error(`ERROR: url:${url} | ${ex.message} | stack: ${ex.stack}`)
+
+  }
 };
 export const fakeFetch = (secs, bodyAsHash = null) => (url, options) => {
   log('fakeFetch() ', url);
