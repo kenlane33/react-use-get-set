@@ -15,18 +15,39 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
   </div>
 )
 
-const doResponseCheck = (res, url, callbackFn )=>{ 
-  if (res.ok) callbackFn(res)
-  else throw new Error(`ERROR: url:${url} status:${res.statusText} `)
-}
-
-const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => (
-  fetchFn( url, { body: hash&&JSON.stringify(hash), ...options } )
-  .then( (res)=>{ 
-    doResponseCheck(res, url, callbackFn )
-  } )
-  .catch( (err)=>{throw(err)} )
+const checkFetchOk = ( res, url )=>(
+  ( res.ok ) ? 
+  Promise.resolve(res) 
+  :
+  Promise.reject( `ERROR: url:${url} status:${res.statusText} `)
 )
+
+
+const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => {
+  fetchFn = fetch
+  log('fetchify() ', 'url:', url, 'hash:', hash, 'opts:', options)
+  return (
+    fetchFn( url, { body: hash&&JSON.stringify(hash), ...options } )
+      // .then( resp => resp.ok ? resp : {json:()=>{return{bogus:1}} } )
+      .then( checkFetchOk )
+      .then( resp => {
+        log('fetchify.resp:', resp)
+        return resp.json()
+      })
+      .then( json => {
+        log( 'fetchify.json:', json)
+        callbackFn(json)
+      }) 
+      // .then(data => console.log(data) )
+
+    // .then( (res)=>{ 
+    //   doResponseCheck(res, url, callbackFn )
+    // } )
+    .catch( (err)=>{
+      throw(err)
+    } )
+  )
+}
 
 const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>{
   log('fakeFetch() ',url)
@@ -92,8 +113,8 @@ export const AutoCrud = (props) => {
 
   useEffect(()=>{ // <<<<<<<<<<<<< Once! 
 
-    fetchGet( crudUrlFor.show, (res)=>{
-      setGettedHash( res.json() )
+    fetchGet( crudUrlFor.show, (json)=>{
+      setGettedHash( json )
       setVerb('show')
     }, {}, fakeFetch(2, hash)) // }, fetch )
 
