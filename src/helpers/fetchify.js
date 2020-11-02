@@ -1,19 +1,25 @@
 
-const {log} = console;
+const {log,error} = console;
 
 const fetchify = async (url, hash, callbackFn, options = {}, fetchFn) => {
   fetchFn = fetch;
   log('fetchify() ', 'url:', url, 'hash:', hash, 'opts:', options);
-  try {
+  // try {
+  {
     const fetchOpts = { body: hash && JSON.stringify(hash), ...options };
-    const res = await fetchFn(url, fetchOpts);
-    if (!res.ok)
-      throw new Error(`ERROR: url:${url} status:${res.statusText}/${res.status}`);
-    const dataHash = await res.json();
-    callbackFn(dataHash);
-  } catch (ex) {
-    throw new Error(`ERROR: url:${url} | ${ex.message} | stack: ${ex.stack}`);
+    const resp = await fetchFn(url, fetchOpts);
+    if (!resp.ok){
+      const errMsg = `ERROR: url:${url} status:${resp.statusText}/${resp.status}`
+      error(errMsg)
+      callbackFn(hash, resp, errMsg) // set it back to original hash
+    } else {
+      const respHash = await resp.json()
+      callbackFn(respHash, resp) // TEST: {...resp, ok:false} )
+    }
   }
+  // catch (ex) {
+  //   throw new Error(`ERROR: url:${url} | ${ex.message} | stack: ${ex.stack}`);
+  // }
 };
 export const fakeFetch = (secs, bodyAsHash = null) => (url, options) => {
   log('fakeFetch() ', url);
