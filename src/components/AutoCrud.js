@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import {AutoForm} from './AutoForm'
 import AutoShowHash from './AutoShowHash'
 import { useEzForm } from "../hooks/useEzForm"
+import { fetchGet, fakeFetch, fetchPut, fetchDelete } from "../helpers/fetchify";
 const {log} = console;
 
 //-------------------------------------o
@@ -13,43 +14,6 @@ export const Fielder = ({label, name, inputs, onChange, ...rest}) => (
       <input type="text" value={inputs[name]} name={name} onChange={onChange} {...rest}/>
     </label><br />
   </div>
-)
-
-const fetchify = async ( url, hash, callbackFn, options={}, fetchFn ) => {
-  fetchFn = fetch
-  log('fetchify() ', 'url:', url, 'hash:', hash, 'opts:', options)
-  try {
-    const fetchOpts = { body: hash&&JSON.stringify(hash), ...options }
-    const res = await fetchFn(url, fetchOpts);
-    if (!res.ok) throw new Error(`ERROR: url:${url} status:${res.statusText}/${res.status}`);
-    const dataHash = await res.json();
-    callbackFn(dataHash)
-  } catch (ex) {
-    throw new Error(`ERROR: url:${url} | ${ex.message} | stack: ${ex.stack}`)
-  }
-}
-
-const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>{
-  log('fakeFetch() ',url)
-  return new Promise( (fn) => setTimeout( fn, secs*1000, 
-    {
-      ok:true,
-      statusText:'OK',
-      body:JSON.stringify(bodyAsHash),
-      json:()=>bodyAsHash // returns hash
-    }
-  ))
-}
-
-const fetchGet = (url, callbackFn, options={}, fetchFn=fetch ) => (
-  fetchify(url, undefined, callbackFn, {...options, method:'GET'}, fetchFn )
-)
-const fetchPut = ( url, hash, callbackFn, options={}, fetchFn=fetch ) => (
-  fetchify(url, hash, callbackFn, {...options, method:'PUT'}, fetchFn )
-)
-
-const fetchDelete = ( url, callbackFn, options={}, fetchFn=fetch ) => (
-  fetchify(url, undefined, callbackFn, {...options, method:'DELETE'}, fetchFn )
 )
 
 const verbBind = (verb, table, func) => ({ 
@@ -69,9 +33,9 @@ const CrudLink = ({verb, table, func}) => (
       {titleCase(verb)}
   </a>
 )
-export const curdUrlGen = (rootUrl, table, id) => {
-  const base = `${rootUrl}${table}`
-  const baseId = base + `/${id||''}`
+export const crudUrlGen = (rootUrl, table, id) => {
+  const base   = `${rootUrl}${table}`
+  const baseId = `${base}/${id||''}`
   return {
     index:   base,
     new:     base+'/new',
@@ -88,7 +52,7 @@ export const AutoCrud = (props) => {
   const {rootUrl='/', table, hash, id, doSubmitted} = props
   const [verb, doSetVerb] = useState(props.verb||'loading')
   const [gettedHash, setGettedHash] = useState({vals:{}})
-  const crudUrlFor = curdUrlGen(rootUrl, table, id)
+  const crudUrlFor = crudUrlGen(rootUrl, table, id)
   const setVerb = (x)=>{ doSetVerb(x); log(`setVerb(${x})`) }
 
   useEffect(()=>{ // <<<<<<<<<<<<< Once! 
@@ -102,30 +66,22 @@ export const AutoCrud = (props) => {
 
   return <AutoCrudDraw {...{...props, hash:gettedHash, verb, setVerb, doSubmitted}} />
 }
-
+//----############-------------------
 const AutoFormEdit = (props) => {
   const { rootUrl, table, id, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
-  const crudUrlFor = curdUrlGen(rootUrl, table, id)
-
-  const ezForm = useEzForm(
-    hash,
-    (newHash)=>{
-      log('useEzForm.SubmitCallbackFn() ',newHash)
-      doSubmitted(newHash)
-      setVerb('update')
-      fetchPut( crudUrlFor.update, newHash, (res)=>setVerb('show'), {}, fakeFetch(2,null) )
-    }
-  )
+  const crudUrlFor = crudUrlGen(rootUrl, table, id)
+  const uponSubmit = (newHash) => {
+    log('useEzForm.SubmitCallbackFn() ', newHash)
+    doSubmitted(newHash)
+    setVerb('update')
+    fetchPut(crudUrlFor.update, newHash, (res) => setVerb('show'), {}, fakeFetch(2, null))
+  }
+  const ezForm = useEzForm( hash, uponSubmit )
   const SubmitLink = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="/">Save</a>
-
   return (
     <AutoForm {...{...ezForm, SubmitLink, fields}}/>
   )
 }
-
-// const parseLoadingFromVerb = (verb) => (
-//   [ /\.\.\./.test(verb), verb.replace('...','')]
-// )
 
 const LoadingThang = ()=>(
   <div className="spinner">
@@ -139,9 +95,7 @@ const LoadingThang = ()=>(
 export const AutoCrudDraw = (props) => {
   log('AutoCrudDraw', props)
   const { rootUrl, table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
-  // const [loading, verb] = parseLoadingFromVerb(verb)
-  //const setVerbLater = (verb, secs=2) => { setTimeout(()=>setVerb(verb), secs*1000) }
-  const crudUrlFor = curdUrlGen(rootUrl, table, id)
+  const crudUrlFor = crudUrlGen(rootUrl, table, id)
 
   if (verb==='loading') { return ( // <<<<<<<<<<<<<<<<<<<<<< LOADING
     <div><LoadingThang/></div>
