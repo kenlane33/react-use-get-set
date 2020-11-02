@@ -38,16 +38,27 @@ const fetchify = ( url, hash, callbackFn, options={}, fetchFn ) => {
         log( 'fetchify.json:', json)
         callbackFn(json)
       }) 
-      // .then(data => console.log(data) )
-
-    // .then( (res)=>{ 
-    //   doResponseCheck(res, url, callbackFn )
-    // } )
-    .catch( (err)=>{
-      throw(err)
-    } )
+      .catch( (err)=>{
+        throw(err)
+      } )
   )
 }
+
+
+// https://attacomsian.com/blog/javascript-fetch-api
+// const fetchUsers = async () => {
+//   try {
+//       const res = await fetch('https://reqres.in/api/users');
+//       if (!res.ok) {
+//           throw new Error(res.status);
+//       }
+//       const data = await res.json();
+//       console.log(data);
+//   } catch (error) {
+//       console.log(error);
+//   }
+// }
+
 
 const fakeFetch = (secs, bodyAsHash=null) => (url,options)=>{
   log('fakeFetch() ',url)
