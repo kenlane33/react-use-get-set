@@ -64,7 +64,7 @@ export const AutoCrud = (props) => {
 
   useEffect(()=>{ // <<<<<<<<<<<<< Once! 
 
-    fetchGet( crudUrlFor.show, (hash, res)=>{
+    fetchGet( crudUrlFor.index, (hash, res)=>{
       setGettedHash( hash )
       setVerb('show')
     }, {}, fakeFetch(2, hash)) // }, fetch )

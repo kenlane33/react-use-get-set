@@ -60,17 +60,20 @@ const hash = {
       </div>
       <br />  
       {/* ------------------------------------------ */}
-      <div style={{border:'1px solid grey'}}>
+      <div style={{border:'1px solid grey',textAlign:'left'}}>
         <FormHeader txt="Fully automatic AutoCrud" />
-        <Code>{`<AutoCrud hash={hash} />`}</Code>
-        <br/><br/>
-        <AutoCrud {...{
-          table:'users', 
-          // hash, 
-          doSubmitted, 
-          id: 1,
-          rootUrl:'https://fakestoreapi.com/'
-        }}/>
+        <div style={{paddingLeft:20}}>
+          <Code>{`<AutoCrud hash={hash} />`}</Code>
+          <br/>
+          <br/>
+          <AutoCrud {...{
+            table:'users', 
+            // hash, 
+            doSubmitted, 
+            id: 1,
+            rootUrl:'https://fakestoreapi.com/'
+          }}/>
+        </div>
       </div>
       <br />  
       {/* ------------------------------------------ */}
