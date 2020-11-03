@@ -9,13 +9,14 @@ export const DemoAutoCrud = () => {
   let [submittedTxt, setSubmittedTxt] = useState('_')
   // let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
-  const hash0 = {
-    phone: '999-123-4567', // just an initial value
-    first:['Gee', {style:{color:'blue'}, label:'First name==>'}], // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.first
-    last:'Willikars',      // just an initial value
-    pw: ['12345', {type:'password'}] // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
-  }
-  const [hash, setHash] = useState(hash0)
+  // const hash0 = {
+  //   phone: '999-123-4567', // just an initial value
+  //   first:['Gee', {style:{color:'blue'}, label:'First name==>'}], // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.first
+  //   last:'Willikars',      // just an initial value
+  //   pw: ['12345', {type:'password'}] // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
+  // }
+  // const [hash, setHash] = useState(hash0)
+  const [hash, setHash] = useState({})
 
   const FormHeader = ({txt}) => (
     <div style={{padding:10, backgroundColor:'#eee', marginBottom:10}}>
@@ -67,11 +68,11 @@ const hash = {
           <br/>
           <br/>
           <AutoCrud {...{
-            table:'users', 
-            // hash, 
+            rootUrl:'https://fakestoreapi.com/',
+            table:'users',
+            verb: 'show',
             doSubmitted, 
             id: 1,
-            rootUrl:'https://fakestoreapi.com/'
           }}/>
         </div>
       </div>

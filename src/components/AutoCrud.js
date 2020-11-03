@@ -54,39 +54,47 @@ export const crudUrlGen = (rootUrl, table, id) => {
   }
 }
 
+//===========########========================================
 export const AutoCrud = (props) => {
-
+  const verb0 = props.verb || 'index'
   const {rootUrl='/', table, hash, id, doSubmitted} = props
-  const [verb, doSetVerb] = useState(props.verb||'loading')
+  const [verb, doSetVerb] = useState('loading'+titleCase(verb0))
   const [gettedHash, setGettedHash] = useState({vals:{}})
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
   const setVerb = (x)=>{ log(`setVerb(${x})`); doSetVerb(x);  }
-
+  
   useEffect(()=>{ // <<<<<<<<<<<<< Once! 
-
-    fetchGet( crudUrlFor.index, (hash, res)=>{
+    const getUrl = crudUrlFor[ (verb0==='index'||verb0==='show') ? verb0 : 'show' ]
+    fetchGet( getUrl, (hash, res)=>{
       setGettedHash( hash )
-      setVerb('show')
+      setVerb(verb0)
     }, {}, fakeFetch(2, hash)) // }, fetch )
-
-  },[ hash, id, crudUrlFor.show ]) // <<<<< Dependencies
-
-  return <AutoCrudDraw {...{...props, hash:gettedHash, verb, setVerb, doSubmitted}} />
+    
+  },[ hash, id, props.verb ]) // <<<<< Dependencies
+  
+  const nextProps = { ...props, hash: gettedHash, verb, setVerb, doSubmitted, setGettedHash };
+  return (
+    <AutoCrudDraw {...nextProps} />
+  )
 }
-//----############-------------------
+
+//====############============================================
 const AutoFormEdit = (props) => {
   const { rootUrl, table, id, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
-  const uponSubmit = (newHash, resp) => {
+
+  const afterSubmitFn = (newHash, resp) => {
     log('useEzForm.SubmitCallbackFn() ', newHash)
     doSubmitted(newHash)
     setVerb('update')
-    fetchPut(crudUrlFor.update, newHash, (hash, res) => setVerb('show'), {}, fakeFetch(2, null))
+    const afterFetchPutFn = (hash, res) => {setVerb('show')}
+    fetchPut(crudUrlFor.update, newHash, afterFetchPutFn, {}, fakeFetch(2, null))
   }
-  const ezForm = useEzForm( hash, uponSubmit )
-  const SubmitLink = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="/">Save</a>
+  const ezForm = useEzForm( hash, afterSubmitFn )
+
+  const SubmitBtn = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="/">Save</a>
   return (
-    <AutoForm {...{...ezForm, SubmitLink}}/>
+    <AutoForm {...{...ezForm, SubmitBtn, fields}}/>
   )
 }
 
@@ -107,29 +115,33 @@ const FakeItems = ({setVerb, table}) => [1,2,3,4].map( (x)=> (
 //-------------------------------------o
 export const AutoCrudDraw = (props) => {
   log('AutoCrudDraw()', props)
-  const { rootUrl, table, id, verb, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
+  const { rootUrl, table, id, verb, hash, setVerb, 
+          doSubmitted, fields=Object.keys(hash), setGettedHash 
+  } = props
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
 
   const comps = {
-    Loading: (p)=><div>
+    LoadingShow: (p)=><div>
+      <LoadingThang/>
+    </div>,
+
+    LoadingIndex: (p)=><div>
       <LoadingThang/>
     </div>,
 
     Index:   (p)=><div>
-      <div>Index</div>
-      <FakeItems {...{setVerb, table}}/>
+      {/* <FakeItems {...{setVerb, table}}/> */}
+      <AutoShowHash {...{hash, fields}} />
       <br/>
       <CrudLink verb="add" table={p.table} func={()=>{setVerb('new') }}/>
     </div>,
 
     New:     (p)=><div>
-      Add
       <AutoFormEdit {...{...p, hash:clearedHash(hash)}} />
       <CrudLink verb="cancel" table={p.table} func={()=>{setVerb('index') }}/>
     </div>,
 
     Create:     (p)=><div>
-      Create
       <AutoShowHash {...{hash, fields}} />
       <LoadingThang />
       <CrudLink verb="cancel" table={p.table} func={()=>{setVerb('index') }}/>
@@ -156,7 +168,15 @@ export const AutoCrudDraw = (props) => {
           else       {setVerb('destroyedERR'); log('fetchDelete().res ',res) }
         }, {}, fakeFetch(2,null))
       }}/>
-      <CrudLink verb="index"   table={table} func={()=>{ setVerb('index') }}/>
+      <CrudLink verb="index"   table={table} func={()=>{
+        fetchGet( crudUrlFor.index, (gettedHash, res)=>{
+          //setGettedHash( hash )
+          log('Index.res=',res, 'gettedHash=', gettedHash)
+          setGettedHash( gettedHash )
+          setVerb('index')
+        }, {}, fetch)
+        setVerb('loadingIndex')
+      }}/>
     </div>,
     Destroying: ({table}) => <div>
       <LoadingThang/>
@@ -176,51 +196,16 @@ export const AutoCrudDraw = (props) => {
   }
   log(`<CompToRender/> = <${titleCase(verb)}/> | ${verb}`)
   const CompToRender = comps[titleCase(verb)]
-  return <CompToRender {...props}/>
-
-  if (verb==='loading') { return ( // <<<<<<<<<<<<<<<<<<<<<< LOADING
-    <div><LoadingThang/></div>
-  )} else
-  if (verb==='edit') { return ( // <<<<<<<<<<<<<<<<<<<<<< EDIT
-    <>
-      <AutoFormEdit {...{...props, doSubmitted, id}} />
-      <CrudLink verb="cancel"   table={table} func={()=>{setVerb('show') }}/>
-    </> 
-  )} else
-  if (verb==='show' || verb==='update') { return ( // <<<<<<<<<<<<<<<<<<<<<< SHOW
-      <div>
-        <AutoShowHash {...{hash, fields}} />
-        {(verb==='update') ? <LoadingThang/> : 
-          <>
-            <CrudLink verb="edit"   table={table} func={()=>{ setVerb('edit') }}/>
-            <CrudLink verb="destroy" table={table} func={()=>{ 
-              setVerb('destroying')
-              //setVerbLater('destroyed')
-              fetchDelete( crudUrlFor.destroy, /* and then */ (res)=>{
-                if (res.ok) setVerb('destroyed') 
-                else setVerb('destroyedERR')
-              }, {}, fakeFetch(2,null))
-            }}/>
-          </>
-        }
+  return (CompToRender) ? 
+    <div>
+      <div style={{background:'#ddd', padding:10}}>
+        {titleCase(verb)}
       </div>
-  )} else
-  if (verb==='destroying') { return ( // <<<<<<<<<<<<<<<<<<<<<< DELETING
-    <div>
-      {/*fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
-      <LoadingThang/>
-      <div><b>Deleting</b></div>
-      <CrudLink verb="undo" table={table} func={()=>{setVerb('show') }}/>
+      <div style={{padding:'5px 20px'}}>
+        <CompToRender {...props}/> 
+      </div>
     </div>
-  )}
-  if (verb==='destroyed') { return (  // <<<<<<<<<<<<<<<<<<<<<< DELETED
-    <div>
-      {fields.map((x,i)=><br key={i}/>)/* Some spacers of similar size */}
-      <div><b>Deleted</b></div>
-      <CrudLink verb="undo" table={table} func={()=>{setVerb('show') }}/>
-    </div>
-  )}
-  else { return (
-    <div>Ummmm... {verb}</div>
-  )}
+  : <div>
+    Cannot find {`<CompToRender/> for verb=${verb}`} {JSON.stringify(props)}
+  </div>
 }
