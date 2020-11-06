@@ -72,4 +72,126 @@ export const unpackHashArrs = ( hash, hashArr = [] ) => {
 //   d:[88,99,111] 
 // } )
 //> [{a:1, b:2, c:6, d:88}, {c:7, d:99}, {d:111}]
+export const isObj = (o) => (!!o && Object.prototype.toString.call(o) === '[object Object]')
+//===========//////////===========================O
+//           flattenObj
+const digFlat = (o, k, v, prefix) => (isObj(v)) ? flattenObj(v, prefix+k+'.', o) : {[prefix+k]:v}
+export const flattenObj = (o, prefix='') => (
+  Object.entries(o).reduce( (accum,[k,v])=>(
+    {...accum, ...digFlat(accum, k, v, prefix)}
+  ), {})
+) // Usage: --------------------------
+// const flattenMe = {a:{b:1,c:2, d:{g:7,h:8}}, q:1, r: 2, s:3, x:{y:9, z:99}}
+// flattenObj(flattenMe)
+// => 
+// {
+//   "a.b":   1,
+//   "a.c":   2,
+//   "a.d.g": 7,
+//   "a.d.h": 8,
+//   "q":     1,
+//   "r":     2,
+//   "s":     3,
+//   "x.y":   9,
+//   "x.z":   99
+// }
+const {log} = console
 
+//===========/////////===========================O
+export const cloneObj = (obj_in) => {
+  if (!!obj_in || !isObj(obj_in)) return obj_in
+  let newObj = Array.isArray(obj_in) ? [] : {}
+  for (let key in obj_in) {
+    newObj[key] = cloneObj(obj_in[key])
+  }
+  return newObj
+}// Usage: --------------------------
+// log( JSON.stringify(cloneObj({a:{b:1,c:2, d:{x:1}}, g:7, h:8}))) // {"a":{"b":1,"c":2,"d":{"x":1}},"g":7,"h":8}
+
+//===========////////===========================O
+export const deepSet = (obj_in, path, val, keys=path.split('.')) => {
+  let o = cloneObj(obj_in), rootO = o, n = keys.length
+  const isLast = (i)=>( i+1 == n )
+  keys.forEach( (key, i)=>{
+    o[key] = (isLast(i)) ? val : (o[key] || {})
+    o = o[key]// dig into o at key
+  })
+  return rootO
+} // Usage: --------------------------
+const a = {a:{b:1,c:2, d:{x:1}}, g:7, h:8}
+log( JSON.stringify(a) )                        //  {"a":{"b":1,"c":2,"d":{"x":1}},"g":7,"h":8}
+log( JSON.stringify(deepSet(a,'a.d.y', 999)) )  //  {"a":{"b":1,"c":2,"d":{"x":1,"y":999}},"g":7,"h":8}
+log( JSON.stringify(deepSet(a,'a.p.q', 999)) )  //  {"a":{"b":1,"c":2,"d":{"x":1,"y":999},"p":{"q":999}},"g":7,"h":8}
+log( JSON.stringify(deepSet({}, 't.m.l', 42)) ) //  {"t":{"m":{"l":42}}}
+
+//===========//////////===========================O
+export const unFlattenObj = (o) => {
+  let newO = {}
+  Object.entries(o).forEach( ([path, val]) => {
+    newO = deepSet(newO, path, val)
+  })
+  return newO
+}
+// Usage: --------------------------
+const unFlattenMe = {
+  "a.b":   1,
+  "a.c":   2,
+  "a.d.g": 7,
+  "a.d.h": 8,
+  "q":     1,
+  "r":     2,
+  "s":     3,
+  "x.y":   9,
+  "x.z":   99
+}
+console.log( 'unFlattenObj()', unFlattenObj(unFlattenMe) )
+
+//===========//////////===========================O
+// export const unFlattenObj = (o) => {
+//   let newO = {}
+//   Object.entries(o).forEach( ([multiKey, val]) => {
+//     // baseSet(newO, multiKey, val)
+//     const keys = multiKey.split('.')
+//     log('unFlattenObj()', keys)
+//     let isLast = (i)=> ( i == (keys.length-1) )
+
+//     let addSpot = newO[keys[0]]
+//     let addFn = (x) => newO[keys[0]] = x
+//     keys.forEach( (key, i)=>{
+//       //   addHere = (addHere && addHere[key]) || {}
+//       if (isLast(i)) { addFn(val) }
+//       else {
+//         addFn(key)
+//         addFn = (x) => addSpot[key] = val
+//         addSpot = addSpot[key] || {}
+//       }
+//     })
+//   })
+//   return newO
+// } // Usage: --------------------------
+// const unFlattenMe = {
+//   "a.b":   1,
+//   "a.c":   2,
+//   "a.d.g": 7,
+//   "a.d.h": 8,
+//   "q":     1,
+//   "r":     2,
+//   "s":     3,
+//   "x.y":   9,
+//   "x.z":   99
+// }
+// console.log( 'unFlattenObj()', unFlattenObj(unFlattenMe) )
+// const flattenMe = {a:{b:1,c:2, d:{g:7,h:8}}, q:1, r: 2, s:3, x:{y:9, z:99}}
+// flattenObj(flattenMe)
+// => 
+// {
+//   "a.b":   1,
+//   "a.c":   2,
+//   "a.d.g": 7,
+//   "a.d.h": 8,
+//   "q":     1,
+//   "r":     2,
+//   "s":     3,
+//   "x.y":   9,
+//   "x.z":   99
+// }
