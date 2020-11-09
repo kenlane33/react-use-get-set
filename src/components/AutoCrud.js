@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react"
 // import { ensureArr } from '../helpers/iterators'
-import {AutoForm, AutoFormTree} from './AutoForm'
+import {AutoFormTree} from './AutoForm'
 import AutoShowHash from './AutoShowHash'
 import { useEzForm } from "../hooks/useEzForm"
 import { fetchGet, fakeFetch, fetchPut, fetchDelete } from "../helpers/fetchify"
 import { flattenObj } from '../helpers/iterators'
+import { titleCase } from '../helpers/string_helpers'
 const {log} = console;
 
 //-------------------------------------o
@@ -24,7 +25,7 @@ const verbBind = (verb, table, func) => ({
     func(table,verb,ev)
   },
 })
-const titleCase = ([firstLetter, ...rest]) => (firstLetter.toUpperCase() + rest.join(''))
+
 //const singular = (word) => word.replace(/[s|es]\b/,'')
 
 const clearedHash = (hash) => {
@@ -63,15 +64,16 @@ export const AutoCrud = (props) => {
   const [gettedHash, setGettedHash] = useState({vals:{}})
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
   const setVerb = (x)=>{ log(`setVerb(${x})`); doSetVerb(x);  }
-  
+  const urlToGetFrom = crudUrlFor[ (verb==='index'||verb==='show') ? verb : 'show' ]
+
   useEffect(()=>{ // <<<<<<<<<<<<< Once! 
-    const getUrl = crudUrlFor[ (verb0==='index'||verb0==='show') ? verb0 : 'show' ]
-    fetchGet( getUrl, (hash, res)=>{
+    // const getUrl = urlFromVerb(verb0)//crudUrlFor[ (verb0==='index'||verb0==='show') ? verb0 : 'show' ]
+    fetchGet( urlToGetFrom, (hash, res)=>{
       setGettedHash( hash )
       setVerb(verb0)
     })
     
-  },[verb0]) // <<<<< Dependencies
+  },[verb0, urlToGetFrom]) // <<<<< Dependencies
   
   const nextProps = { ...props, hash: gettedHash, verb, setVerb, doSubmitted, setGettedHash };
   return (
@@ -112,7 +114,7 @@ const LoadingThang = ()=>(
 
 //-------------------------------------o
 export const AutoCrudDraw = (props) => {
-  log('AutoCrudDraw()', props)
+  //log('AutoCrudDraw()', props)
   const { rootUrl, table, id, verb, hash, setVerb, 
           doSubmitted, fields=Object.keys(hash), setGettedHash 
   } = props
@@ -206,6 +208,7 @@ export const AutoCrudDraw = (props) => {
       </div>
     </div>
   : <div>
-    Cannot find {`<CompToRender/> for verb=${verb}`} {JSON.stringify(props)}
+    Cannot find {`<CompToRender/> for verb=${verb}`} <br/>
+    <pre>{JSON.stringify(props)}</pre>
   </div>
 }

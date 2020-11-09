@@ -73,6 +73,16 @@ const hash = {
             verb: 'edit',
             doSubmitted, 
             id: 1,
+            fields:['name.lastname', 'address.city']
+          }}/>
+          <br/>
+          <AutoCrud {...{
+            rootUrl:'https://fakestoreapi.com/',
+            table:'users',
+            verb: 'edit',
+            doSubmitted, 
+            id: 1,
+            fields: undefined,
           }}/>
         </div>
       </div>
