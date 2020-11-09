@@ -64,10 +64,10 @@ export const AutoFormTree = (props) => {
                   <IndentedParent label={titleCase(x)} />
                 </div>
               )
-              depth++;
+              depth++
               return ret
             })}
-            {parents.map((x,i)=><IndentSpacer key={i}/>)}
+            {someIndentSpacers(parents.length)}
             <LabeledValue key={k} label={titleCase(lastK)+': '} {...inputBinds[k]} />
           </div>
         )
