@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react"
 // import { ensureArr } from '../helpers/iterators'
-import {AutoForm} from './AutoForm'
+import {AutoForm, AutoFormTree} from './AutoForm'
 import AutoShowHash from './AutoShowHash'
 import { useEzForm } from "../hooks/useEzForm"
-import { fetchGet, fakeFetch, fetchPut, fetchDelete } from "../helpers/fetchify";
+import { fetchGet, fakeFetch, fetchPut, fetchDelete } from "../helpers/fetchify"
+import { flattenObj } from '../helpers/iterators'
 const {log} = console;
 
 //-------------------------------------o
@@ -24,7 +25,7 @@ const verbBind = (verb, table, func) => ({
   },
 })
 const titleCase = ([firstLetter, ...rest]) => (firstLetter.toUpperCase() + rest.join(''))
-const singular = (word) => word.replace(/[s|es]\b/,'')
+//const singular = (word) => word.replace(/[s|es]\b/,'')
 
 const clearedHash = (hash) => {
   let newHash = {}
@@ -68,9 +69,9 @@ export const AutoCrud = (props) => {
     fetchGet( getUrl, (hash, res)=>{
       setGettedHash( hash )
       setVerb(verb0)
-    }, {}, fakeFetch(2, hash)) // }, fetch )
+    })//, {}, fakeFetch(2, hash)) // }, fetch )
     
-  },[ hash, id, props.verb ]) // <<<<< Dependencies
+  },[])//[ id, props.verb, crudUrlFor, verb0 ]) // <<<<< Dependencies
   
   const nextProps = { ...props, hash: gettedHash, verb, setVerb, doSubmitted, setGettedHash };
   return (
@@ -80,7 +81,10 @@ export const AutoCrud = (props) => {
 
 //====############============================================
 const AutoFormEdit = (props) => {
-  const { rootUrl, table, id, hash, setVerb, doSubmitted, fields=Object.keys(hash) } = props
+  const { rootUrl, table, id, hash, setVerb, doSubmitted } = props
+  const flatHash = flattenObj(hash)
+  const fields = props.fields || Object.keys(flatHash)
+  
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
 
   const afterSubmitFn = (newHash, resp) => {
@@ -90,11 +94,11 @@ const AutoFormEdit = (props) => {
     const afterFetchPutFn = (hash, res) => {setVerb('show')}
     fetchPut(crudUrlFor.update, newHash, afterFetchPutFn, {}, fakeFetch(2, null))
   }
-  const ezForm = useEzForm( hash, afterSubmitFn )
+  const ezForm = useEzForm( flatHash, afterSubmitFn )
 
   const SubmitBtn = (p) => <a {...p} style={{padding: 8, lineHeight: 2}} href="/">Save</a>
   return (
-    <AutoForm {...{...ezForm, SubmitBtn, fields}}/>
+    <AutoFormTree {...{...ezForm, SubmitBtn, fields}}/>
   )
 }
 
@@ -105,13 +109,7 @@ const LoadingThang = ()=>(
     <div className="bounce3"></div>
   </div>
 )
-const FakeItems = ({setVerb, table}) => [1,2,3,4].map( (x)=> (
-  <div key={x}>
-    {singular(titleCase(table))} #{x}
-    <CrudLink verb="show" table={table} id={x} func={()=>{setVerb('show') }}/>
-    <CrudLink verb="edit" table={table} id={x} func={()=>{setVerb('edit') }}/>
-  </div>
-))
+
 //-------------------------------------o
 export const AutoCrudDraw = (props) => {
   log('AutoCrudDraw()', props)
@@ -130,8 +128,14 @@ export const AutoCrudDraw = (props) => {
     </div>,
 
     Index:   (p)=><div>
-      {/* <FakeItems {...{setVerb, table}}/> */}
-      <AutoShowHash {...{hash, fields}} />
+      {(typeof hash==='object') ? 
+        <AutoShowHash {...{hash, fields}} />
+      :
+      hash.map((h,i)=> (
+        h && <div key={i}>
+          <AutoShowHash {...{h, fields:[]}} />
+        </div> 
+      ))}
       <br/>
       <CrudLink verb="add" table={p.table} func={()=>{setVerb('new') }}/>
     </div>,

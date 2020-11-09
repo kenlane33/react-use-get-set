@@ -1,20 +1,26 @@
 import React, { useState } from "react"
 import { useEzForm } from "../hooks/useEzForm"
 import { DemoHeader } from './DemoHeader'
-import { AutoForm, Fielder } from '../components/AutoForm'
+import { AutoForm, DefLabeledValue } from '../components/AutoForm'
 import { PrismCode } from "../components/PrismCode"
+import { flattenObj } from '../helpers/iterators'
+const {log} = console
 
 //===========//////////////========================o
 export const DemoUseEzForm = () => {
   let [submittedTxt, setSubmitted] = useState('_')
   let [seePw, setSeePw] = useState(true)
   //-------------------------------------o
-  const initVals = {
+  const vals0 = {
     phone: '999-123-4567', // just an initial value
     first:['Gee', {style:{color:'blue'}, label:'First name==>'}], // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.first
     last:'Willikars',      // just an initial value
-    pw: ['12345', {type:'password'}] // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
+    pw: ['12345', {type:'password'}], // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
+    address:{num:'121',street:'Easy St.', city:'Green',state:'CA',zip:'54321',}
   }
+  const initVals = flattenObj(vals0)
+  log(initVals)
+
   const ezForm = useEzForm(
     initVals,
     (x)=>{ 
@@ -113,12 +119,12 @@ const initVals = {
       <br />
       {/* ------------------------------------------ */}
       <div style={{border:'1px solid grey'}}>
-        <FormHeader txt="Fielder: Manual form and {...inputBinds.*} for <input/>"/>
+        <FormHeader txt="DefLabeledValue: Manual form and {...inputBinds.*} for <input/>"/>
         <form onSubmit={doSubmit}>
-          <Fielder label='Phone: ' {...inputBinds.phone} />
-          <Fielder label='THIS_LABEL_TXT_OVERRIDDEN_BY_INPUT_BINDS' {...inputBinds.first} />
-          <Fielder label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
-          <Fielder label='Password: ' {...inputBinds.pw} type='password'/>
+          <DefLabeledValue label='Phone: ' {...inputBinds.phone} />
+          <DefLabeledValue label='THIS_LABEL_TXT_OVERRIDDEN_BY_INPUT_BINDS' {...inputBinds.first} />
+          <DefLabeledValue label='Last: ' name='last'   inputs={inputs} onChange={doChange}/>
+          <DefLabeledValue label='Password: ' {...inputBinds.pw} type='password'/>
           <input type="submit" value="Submit" />
         </form>
       </div>
