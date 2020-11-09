@@ -38,7 +38,7 @@ export const AutoFormTree = (props) => {
         console.log(k)
         return (<div key={k}>
           <IndentSpacer />
-          <DefLabeledValue key={k} label={k+': '} {...inputBinds[k]} />
+          <LabeledValue key={k} label={k+': '} {...inputBinds[k]} />
         </div>)
       })}
       {SubmitBtn ? <SubmitBtn onClick={formBind.onSubmit}/> : <input type="submit" value="Submit" />}

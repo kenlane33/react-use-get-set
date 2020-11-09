@@ -111,7 +111,7 @@ export const cloneObj = (obj_in) => {
 //===========////////===========================O
 export const deepSet = (obj_in, path, val, keys=path.split('.')) => {
   let o = cloneObj(obj_in), rootO = o, n = keys.length
-  const isLast = (i)=>( i+1 == n )
+  const isLast = (i)=>( i+1 === n )
   keys.forEach( (key, i)=>{
     o[key] = (isLast(i)) ? val : (o[key] || {})
     o = o[key]// dig into o at key

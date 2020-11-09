@@ -16,7 +16,7 @@ export const DemoAutoCrud = () => {
   //   pw: ['12345', {type:'password'}] // [0] is intial value, [1] is obj to spread onto the ezForm.inputBinds.pw
   // }
   // const [hash, setHash] = useState(hash0)
-  const [hash, setHash] = useState({})
+  //const [hash, setHash] = useState({})
 
   const FormHeader = ({txt}) => (
     <div style={{padding:10, backgroundColor:'#eee', marginBottom:10}}>
@@ -28,7 +28,7 @@ export const DemoAutoCrud = () => {
 
   const doSubmitted = (hash) => {
     setSubmittedTxt( JSON.stringify(hash) )
-    setHash(hash)
+    //setHash(hash)
   }
 
   // const initValsCode = `const initVals = ${JSON.stringify(initVals)}`
@@ -70,7 +70,7 @@ const hash = {
           <AutoCrud {...{
             rootUrl:'https://fakestoreapi.com/',
             table:'users',
-            verb: 'show',
+            verb: 'edit',
             doSubmitted, 
             id: 1,
           }}/>

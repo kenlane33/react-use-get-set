@@ -58,7 +58,7 @@ export const crudUrlGen = (rootUrl, table, id) => {
 //===========########========================================
 export const AutoCrud = (props) => {
   const verb0 = props.verb || 'index'
-  const {rootUrl='/', table, hash, id, doSubmitted} = props
+  const {rootUrl='/', table, id, doSubmitted} = props
   const [verb, doSetVerb] = useState('loading'+titleCase(verb0))
   const [gettedHash, setGettedHash] = useState({vals:{}})
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
@@ -69,9 +69,9 @@ export const AutoCrud = (props) => {
     fetchGet( getUrl, (hash, res)=>{
       setGettedHash( hash )
       setVerb(verb0)
-    })//, {}, fakeFetch(2, hash)) // }, fetch )
+    })
     
-  },[])//[ id, props.verb, crudUrlFor, verb0 ]) // <<<<< Dependencies
+  },[verb0]) // <<<<< Dependencies
   
   const nextProps = { ...props, hash: gettedHash, verb, setVerb, doSubmitted, setGettedHash };
   return (
@@ -119,13 +119,9 @@ export const AutoCrudDraw = (props) => {
   const crudUrlFor = crudUrlGen(rootUrl, table, id)
 
   const comps = {
-    LoadingShow: (p)=><div>
-      <LoadingThang/>
-    </div>,
-
-    LoadingIndex: (p)=><div>
-      <LoadingThang/>
-    </div>,
+    LoadingShow: (p)=><div><LoadingThang/></div>,
+    LoadingIndex: (p)=><div><LoadingThang/></div>,
+    LoadingEdit: (p)=><div><LoadingThang/></div>,
 
     Index:   (p)=><div>
       {(typeof hash==='object') ? 
