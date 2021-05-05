@@ -35,6 +35,7 @@ export const useGetSetState = hash => {
     const [value, setter] = lockedUseState(initVal)
     addGetSetProp(obj, key, value, setter)
   })
+  // console.log('useGetSetState.obj=', obj )
   return obj
 } // Usage: ------------------------------
 // var st = useGetSetState({fun:2, sun:'hot'})
