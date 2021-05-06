@@ -53,7 +53,10 @@ export const DemoUseResetState = () => {
         st.reset.msg(); 
       }}>
         Reset Fun & Msg
-      </button>
+      </button>{" "}
+      <button onClick={()=>{
+        st.setVals({fun:7777, msg:'OooOOOOooo!', lamp:false})
+      }}> setVals </button>{" "}
       <br /><br />
     </div>
   )

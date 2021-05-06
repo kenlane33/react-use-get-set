@@ -6,9 +6,12 @@ export const addGetSetProp = (obj, name, initVal, setterFn) => {
   obj.vals = obj.vals || {} // ensure a vals hash
   obj.vals[name] = initVal // EX: obj.vals.life = 42 where name='life' and initVal=42
   Object.defineProperty(obj, name, {
-    enumerable: true,
-    // set: function(x){this.vals[name] = x},//setter ? (x=>setter(x)) : (function(x){this.val = x}),
-    set: (x)=>{ setterFn && setterFn(x); obj.vals[name] = x },
+    enumerable: false,
+    set: (x)=>{ 
+      setterFn && setterFn(x)
+      obj.vals[name] = x 
+      console.log('SET',{name,x, obj:JSON.stringify(obj)})
+    },
     get: function(){ return obj.vals[name] },
   })
 } // Usage: ----------
@@ -30,6 +33,7 @@ export const addGetSetProp = (obj, name, initVal, setterFn) => {
 export const useGetSetState = hash => {
   const obj = { initVals:{}, vals:{} }
   const lockedUseState = useState
+  obj.setVals = (o) => forEachInHash(o, ([k,v])=> obj[k] && (obj[k] = v) )
   forEachInHash(hash, ([key, initVal]) => {
     obj.initVals[key] = initVal
     const [value, setter] = lockedUseState(initVal)
